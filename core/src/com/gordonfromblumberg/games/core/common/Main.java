@@ -18,9 +18,9 @@ public class Main extends Game {
 	public static boolean DEBUG;
 	public static boolean DEBUG_UI;
 
-	private static Main instance;
-
 	public static final String NAME = "game_template";
+
+	private static Main instance;
 
 	private final AssetManager assetManager;
 	private ConfigManager configManager;

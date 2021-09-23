@@ -5,13 +5,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
 
 public class ToTargetWithDecelerationMovingStrategy extends ToTargetMovingStrategy {
-    protected static final float DELTA = AbstractFactory.getInstance().configManager().getFloat("delta");
-
     protected float decelerationDistance, decelerationDistance2;
     protected float maxDeceleration, maxDeceleration2;
 
-    protected float delta2 = DELTA * DELTA;
-    protected boolean targetReached;
+    protected float targetVelocityLimit2 = 0.1f;
+    protected float targetRadius2 = 0.1f;
+    protected boolean targetReached = true;
 
     public ToTargetWithDecelerationMovingStrategy() {}
 
@@ -26,11 +25,11 @@ public class ToTargetWithDecelerationMovingStrategy extends ToTargetMovingStrate
     }
 
     @Override
-    public void update(Vector2 position, Vector2 velocity, Vector2 acceleration, float dt) {
+    public void update(Vector2 position, Vector2 velocity, Vector2 acceleration, Vector2 rotation, float dt) {
         if (targetReached)
             return;
 
-        super.update(position, velocity, acceleration, dt);
+        super.update(position, velocity, acceleration, rotation, dt);
     }
 
     @Override
@@ -38,7 +37,7 @@ public class ToTargetWithDecelerationMovingStrategy extends ToTargetMovingStrate
         super.setMaxVelocity(maxVelocity);
 
         float calculatedDecelerationDist = calcDecelerationDist();
-        if (calculatedDecelerationDist > decelerationDistance) {
+        if (calculatedDecelerationDist > decelerationDistance && calculatedDecelerationDist < Float.MAX_VALUE) {
             setDecelerationDistance(calculatedDecelerationDist);
         }
     }
@@ -62,40 +61,43 @@ public class ToTargetWithDecelerationMovingStrategy extends ToTargetMovingStrate
 
         if (decelerate) {
             float velocity2 = velocity.len2();
-            acceleration.setLength2(velocity2 * velocity2 / (4 * desMovLen2));
+            float limit2 = velocity2 * velocity2 / (4 * desMovLen2);
+            if (limit2 > maxDeceleration2)
+                limit2 = maxDeceleration2;
+            acceleration.setLength2(limit2);
         } else {
             acceleration.limit2(maxAcceleration2);
         }
     }
 
-    protected void setMaxDeceleration(float maxDeceleration) {
+    public void setMaxDeceleration(float maxDeceleration) {
         this.maxDeceleration = maxDeceleration;
         this.maxDeceleration2 = maxDeceleration * maxDeceleration;
 
         float calculatedDecelerationDist = calcDecelerationDist();
-        if (calculatedDecelerationDist > decelerationDistance) {
+        if (calculatedDecelerationDist > decelerationDistance && calculatedDecelerationDist < Float.MAX_VALUE) {
             setDecelerationDistance(calculatedDecelerationDist);
         }
     }
 
-    protected void setDecelerationDistance(float decelerationDistance) {
+    public void setDecelerationDistance(float decelerationDistance) {
         this.decelerationDistance = decelerationDistance;
         this.decelerationDistance2 = decelerationDistance * decelerationDistance;
     }
 
     protected float calcDecelerationDist() {
-        return maxVelocity2 / (2 * maxDeceleration);
+        return 1.1f * maxVelocity2 / (2 * maxDeceleration);
     }
 
     @Override
     protected void adjustDesiredVelocity(Vector2 velocity) {
         float desMovLen2 = desiredMovement.len2();
 
-        if (desMovLen2 <= delta2 && velocity.len2() <= delta2)
+        if (desMovLen2 <= targetRadius2 && velocity.len2() <= targetVelocityLimit2)
             targetReached = true;
 
+//        Gdx.app.log("Decel dist", "decel dist = " + decelerationDistance2 + ", desired movnt = " + desMovLen2);
         if (desMovLen2 < decelerationDistance2) {
-//            Gdx.app.log("", "decel dist > desired movnt: " + decelerationDistance2 + " > " + desMovLen2);
             desiredVelocity.setLength2(maxVelocity2 * desMovLen2 / decelerationDistance2);
 //            Gdx.app.log("", "desVelocity = " + desiredVelocity);
         } else {

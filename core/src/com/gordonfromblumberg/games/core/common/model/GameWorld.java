@@ -36,6 +36,8 @@ public class GameWorld implements Disposable {
         tree = new BSPTree(0, 0, 0, 0);
     }
 
+    public void initialize(float height) {}
+
     public void setSize(float width, float height) {
         this.width = width;
         this.height = height;

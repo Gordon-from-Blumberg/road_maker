@@ -2,6 +2,7 @@ package com.gordonfromblumberg.games.core.common.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -9,12 +10,13 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.gordonfromblumberg.games.core.common.Main;
+import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
 import com.gordonfromblumberg.games.core.common.model.GameWorld;
+import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
 
 public class GameScreen extends AbstractScreen {
-    private static final String LABEL = "Mouse on ";
-
     TextureRegion background;
     private GameWorld gameWorld;
 
@@ -34,7 +36,7 @@ public class GameScreen extends AbstractScreen {
                 .get("image/texture_pack.atlas", TextureAtlas.class)
                 .findRegion("background");
 
-        gameWorld.setSize(viewport.getWorldWidth(), viewport.getWorldHeight());
+        gameWorld.initialize(viewport.getWorldHeight());
 
         stage.addListener(new InputListener() {
             @Override
