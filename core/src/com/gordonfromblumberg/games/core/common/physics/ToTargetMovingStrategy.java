@@ -23,15 +23,10 @@ public class ToTargetMovingStrategy extends AccelerationMovingStrategy {
     public void update(Vector2 position, Vector2 velocity, Vector2 acceleration, float dt) {
         final Vector2 desiredMovement = this.desiredMovement;
         final Vector2 desiredVelocity = this.desiredVelocity;
-
         desiredMovement.set(target).sub(position);
         desiredVelocity.set(desiredMovement);
-        if (maxVelocity2 > 0)
-            desiredVelocity.limit2(getVelocityLimit());
-
+        adjustDesiredVelocity(velocity);
         acceleration.set(desiredVelocity).sub(velocity);
-        limitAcceleration(velocity, acceleration);
-
         super.update(position, velocity, acceleration, dt);
     }
 
@@ -40,13 +35,7 @@ public class ToTargetMovingStrategy extends AccelerationMovingStrategy {
         target.y = y;
     }
 
-    protected float getVelocityLimit() {
-        return maxVelocity2;
-    }
-
-    protected void limitAcceleration(Vector2 velocity, Vector2 acceleration) {
-        if (maxAcceleration2 > 0) {
-            acceleration.limit2(maxAcceleration2);
-        }
+    protected void adjustDesiredVelocity(Vector2 velocity) {
+        desiredVelocity.setLength2(maxVelocity2);
     }
 }
