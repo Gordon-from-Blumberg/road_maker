@@ -8,19 +8,14 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.gordonfromblumberg.games.core.common.Main;
-import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
 import com.gordonfromblumberg.games.core.common.model.GameWorld;
-import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
-import com.gordonfromblumberg.games.core.common.utils.StringUtils;
 
 public class GameScreen extends AbstractScreen {
     private static final String LABEL = "Mouse on ";
 
     TextureRegion background;
-    private Label label;
     private GameWorld gameWorld;
 
     private final Vector3 coords = new Vector3();
@@ -30,16 +25,14 @@ public class GameScreen extends AbstractScreen {
     }
 
     @Override
-    public void show() {
-        super.show();
+    public void initialize() {
+        super.initialize();
 
         background = Main.getInstance().assets()
                 .get("image/texture_pack.atlas", TextureAtlas.class)
                 .findRegion("background");
 
-        gameWorld = new GameWorld(viewport);
-
-        createUI();
+        gameWorld = new GameWorld(viewport.getWorldHeight(), viewport.getWorldHeight());
 
         stage.addListener(new InputListener() {
             @Override
@@ -81,9 +74,18 @@ public class GameScreen extends AbstractScreen {
 
     @Override
     protected void renderUi() {
-        label.setText(getScore());
         super.renderUi();
     }
+
+//    @Override
+//    protected void createWorldViewport(float worldWidth, float minWorldHeight, float maxWorldHeight) {
+//        camera = new OrthographicCamera();
+//        camera.setToOrtho(false);
+//
+//        float worldSize = AbstractFactory.getInstance().configManager().getFloat("game.size");
+//        viewport = new ExtendViewport(worldSize, worldSize, camera);
+//        viewport.update(Gdx.graphics.getHeight(), Gdx.graphics.getHeight(), true);
+//    }
 
     @Override
     public void dispose() {
@@ -92,19 +94,12 @@ public class GameScreen extends AbstractScreen {
         super.dispose();
     }
 
-    private void createUI() {
+    @Override
+    protected void createUI() {
+        super.createUI();
+
         final Skin uiSkin = assets.get("ui/uiskin.json", Skin.class);
 
-        label = new Label(getScore(), uiSkin);
-        uiRootTable.add(label).left();
-        uiRootTable.row().expand();
-        uiRootTable.add();
-    }
 
-    private String getScore() {
-        coords.x = Gdx.input.getX();
-        coords.y = Gdx.input.getY();
-        gameWorld.convertScreenToWorld(coords);
-        return StringUtils.format("##, #", LABEL, coords.x, coords.y);
     }
 }
