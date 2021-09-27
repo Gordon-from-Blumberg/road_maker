@@ -9,7 +9,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.model.GameWorld;
 
@@ -73,11 +72,6 @@ public class GameScreen extends AbstractScreen {
     protected void renderWorld(float delta) {
         batch.draw(background, 0, 0);
         gameWorld.render(batch);
-    }
-
-    @Override
-    protected void renderUi() {
-        super.renderUi();
     }
 
 //    @Override
