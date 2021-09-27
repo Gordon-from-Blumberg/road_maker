@@ -2,15 +2,19 @@ package com.gordonfromblumberg.games.core.common.model;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 
 import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.event.Event;
+import com.gordonfromblumberg.games.core.common.event.EventHandler;
 import com.gordonfromblumberg.games.core.common.event.EventProcessor;
 import com.gordonfromblumberg.games.core.common.screens.AbstractScreen;
 import com.gordonfromblumberg.games.core.common.utils.BSPTree;
+
+import java.util.Iterator;
 
 public class GameWorld implements Disposable {
 
@@ -20,18 +24,22 @@ public class GameWorld implements Disposable {
     private final EventProcessor eventProcessor = new EventProcessor();
 
     public Rectangle visibleArea;
+    private float width, height;
 
     private int maxCount = 0;
 
     private float time = 0;
     private int score = 0;
 
-    public GameWorld(float worldWidth, float worldHeight) {
-        visibleArea = new Rectangle(0, 0, worldWidth, worldHeight);
-        tree = new BSPTree(0, 0, worldWidth, worldHeight);
+    public GameWorld() {
+        visibleArea = new Rectangle();
+        tree = new BSPTree(0, 0, 0, 0);
     }
 
-    public void init() {
+    public void setSize(float width, float height) {
+        this.width = width;
+        this.height = height;
+        visibleArea.setSize(width, height);
     }
 
     public void addGameObject(GameObject gameObject) {
@@ -51,11 +59,17 @@ public class GameWorld implements Disposable {
 
     public void update(float delta) {
         time += delta;
-        tree.resetAndMove(0, 0);
+//        visibleArea.set(0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
+//        tree.resetAndMove(0, 0);
 
         for (GameObject gameObject : gameObjects) {
             gameObject.update(delta);
+            if (gameObject.active && gameObject.colliding) {
+//                tree.addObject(gameObject);
+            }
         }
+
+        detectCollisions();
 
         eventProcessor.process();
 
@@ -93,12 +107,39 @@ public class GameWorld implements Disposable {
         screen.dispose();
     }
 
-    public int getScore() {
-        return score;
+    public void registerHandler(String type, EventHandler handler) {
+        eventProcessor.registerHandler(type, handler);
     }
 
     public void pushEvent(Event event) {
         eventProcessor.push(event);
+    }
+
+    private void detectCollisions() {
+        while (tree.hasNext()) {
+            final Iterator<GameObject> iterator = tree.next();
+            final Iterator<GameObject> internalIterator = tree.internalIterator();
+            while (iterator.hasNext()) {
+                final GameObject gameObject = iterator.next();
+                if (!gameObject.active)
+                    continue;
+
+                while (internalIterator.hasNext()) {
+                    final GameObject internalGameObject = internalIterator.next();
+                    if (!internalGameObject.active)
+                        continue;
+
+                    if (detectCollision(gameObject, internalGameObject)) {
+                        gameObject.collide(internalGameObject);
+                    }
+                }
+            }
+        }
+    }
+
+    private boolean detectCollision(GameObject obj1, GameObject obj2) {
+        return obj1.getBoundingRectangle().overlaps(obj2.getBoundingRectangle())
+                && Intersector.intersectPolygons(obj1.getPolygon(), obj2.getPolygon(), null);
     }
 
     @Override

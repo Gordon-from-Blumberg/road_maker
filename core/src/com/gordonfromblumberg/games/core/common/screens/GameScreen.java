@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.model.GameWorld;
 
@@ -22,6 +23,8 @@ public class GameScreen extends AbstractScreen {
 
     protected GameScreen(SpriteBatch batch) {
         super(batch);
+
+        gameWorld = new GameWorld();
     }
 
     @Override
@@ -32,7 +35,7 @@ public class GameScreen extends AbstractScreen {
                 .get("image/texture_pack.atlas", TextureAtlas.class)
                 .findRegion("background");
 
-        gameWorld = new GameWorld(viewport.getWorldHeight(), viewport.getWorldHeight());
+        gameWorld.setSize(viewport.getWorldWidth(), viewport.getWorldHeight());
 
         stage.addListener(new InputListener() {
             @Override
