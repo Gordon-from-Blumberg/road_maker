@@ -51,12 +51,6 @@ public class GameScreen extends AbstractScreen {
     }
 
     @Override
-    public void resize(int width, int height) {
-        viewport.update(width, height, false);
-        uiViewport.update(width, height, true);
-    }
-
-    @Override
     protected void update(float delta) {
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
             camera.translate(-10, 0);
@@ -76,16 +70,6 @@ public class GameScreen extends AbstractScreen {
         batch.draw(background, 0, 0);
         renderer.render(batch);
     }
-
-//    @Override
-//    protected void createWorldViewport(float worldWidth, float minWorldHeight, float maxWorldHeight) {
-//        camera = new OrthographicCamera();
-//        camera.setToOrtho(false);
-//
-//        float worldSize = AbstractFactory.getInstance().configManager().getFloat("game.size");
-//        viewport = new ExtendViewport(worldSize, worldSize, camera);
-//        viewport.update(Gdx.graphics.getHeight(), Gdx.graphics.getHeight(), true);
-//    }
 
     @Override
     public void dispose() {
