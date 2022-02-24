@@ -3,26 +3,30 @@ package com.gordonfromblumberg.games.core.common.world;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
+import com.gordonfromblumberg.games.core.common.screens.FBORenderer;
 import com.gordonfromblumberg.games.core.common.model.GameObject;
 
-public class GameWorldRenderer {
+public class GameWorldRenderer extends FBORenderer {
     private static final Color TEMP_COLOR = new Color();
     private final GameWorld world;
+    private final Batch batch;
     private Viewport viewport;
     private final Rectangle worldArea = new Rectangle();
 
     private final Color pauseColor = Color.GRAY;
     private final Color tempClr1 = new Color(), tempClr2 = new Color();
+    TextureRegion background;
 
-    private NinePatch background;
+    public GameWorldRenderer(GameWorld world, Batch batch, Viewport viewport) {
+        super(viewport);
 
-    public GameWorldRenderer(GameWorld world) {
+        this.batch = batch;
         this.world = world;
     }
 
@@ -32,17 +36,20 @@ public class GameWorldRenderer {
         this.viewport = viewport;
         worldArea.setSize(width, height);
 
-        background = new NinePatch(
-                assets.get("image/texture_pack.atlas", TextureAtlas.class)
-                        .findRegion("world-background"),
-                1, 1, 1, 1
-        );
+        background = assets
+                .get("image/texture_pack.atlas", TextureAtlas.class)
+                .findRegion("background");
     }
 
-    public void render(Batch batch) {
+    @Override
+    public void render(float dt) {
+        batch.begin();
         final Color origColor = TEMP_COLOR.set(batch.getColor());
-        if (world.paused)
+        if (world.paused) {
             batch.setColor(pauseColor);
+        }
+
+        batch.draw(background, 0, 0);
 
         if (world.paused) {
             for (GameObject gameObject : world.getGameObjects()) {
@@ -60,5 +67,7 @@ public class GameWorldRenderer {
             world.pauseText.draw(batch);
             batch.setColor(origColor);
         }
+
+        batch.end();
     }
 }

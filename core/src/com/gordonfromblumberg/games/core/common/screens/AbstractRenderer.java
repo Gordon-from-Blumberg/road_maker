@@ -8,8 +8,8 @@ public abstract class AbstractRenderer implements Renderer {
     protected Viewport viewport;
     protected boolean centerCamera;
 
-    protected AbstractRenderer(Camera camera, Viewport viewport) {
-        this.camera = camera;
+    protected AbstractRenderer(Viewport viewport) {
+        this.camera = viewport.getCamera();
         this.viewport = viewport;
     }
 

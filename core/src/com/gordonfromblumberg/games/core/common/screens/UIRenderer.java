@@ -7,8 +7,8 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 public class UIRenderer extends AbstractRenderer {
     private Stage stage;
 
-    public UIRenderer(Camera camera, Viewport viewport, Stage stage) {
-        super(camera, viewport);
+    public UIRenderer(Viewport viewport, Stage stage) {
+        super(viewport);
 
         this.stage = stage;
         this.centerCamera = true;

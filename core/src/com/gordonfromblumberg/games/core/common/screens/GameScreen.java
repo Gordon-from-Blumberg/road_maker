@@ -16,7 +16,6 @@ import com.gordonfromblumberg.games.core.common.world.GameWorld;
 import com.gordonfromblumberg.games.core.common.world.GameWorldRenderer;
 
 public class GameScreen extends AbstractScreen {
-    TextureRegion background;
     private GameWorld gameWorld;
     private GameWorldRenderer renderer;
 
@@ -26,18 +25,16 @@ public class GameScreen extends AbstractScreen {
         super(batch);
 
         gameWorld = new GameWorld();
-        renderer = new GameWorldRenderer(gameWorld);
     }
 
     @Override
     public void initialize() {
         super.initialize();
 
-        background = Main.getInstance().assets()
-                .get("image/texture_pack.atlas", TextureAtlas.class)
-                .findRegion("background");
-
+        final ConfigManager configManager = AbstractFactory.getInstance().configManager();
         gameWorld.initialize();
+        worldRenderer = renderer = new GameWorldRenderer(gameWorld, batch, viewport);
+        renderer.initialize(viewport, viewport.getWorldHeight(), viewport.getWorldHeight());
 
         stage.addListener(new InputListener() {
             @Override
@@ -63,12 +60,6 @@ public class GameScreen extends AbstractScreen {
 
         super.update(delta);            // apply camera moving and update batch projection matrix
         gameWorld.update(delta);        // update game state
-    }
-
-    @Override
-    protected void renderWorld(float delta) {
-        batch.draw(background, 0, 0);
-        renderer.render(batch);
     }
 
     @Override

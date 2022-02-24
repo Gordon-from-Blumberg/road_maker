@@ -126,7 +126,7 @@ public abstract class AbstractScreen implements Screen {
         camera.setToOrtho(false);
         Viewport viewport = new ExtendViewport(worldWidth, minWorldHeight, worldWidth, maxWorldHeight, camera);
         stage = new Stage(viewport, batch);
-        uiRenderer = new UIRenderer(camera, viewport, stage);
+        uiRenderer = new UIRenderer(viewport, stage);
     }
 
     protected void createUI() {
