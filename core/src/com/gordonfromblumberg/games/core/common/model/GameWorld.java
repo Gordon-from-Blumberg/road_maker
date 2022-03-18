@@ -1,9 +1,13 @@
 package com.gordonfromblumberg.games.core.common.model;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.BitmapFontCache;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 
@@ -17,6 +21,7 @@ import com.gordonfromblumberg.games.core.common.utils.BSPTree;
 import java.util.Iterator;
 
 public class GameWorld implements Disposable {
+    private static final Color TEMP_COLOR = new Color();
 
     private final Array<GameObject> gameObjects = new Array<>();
 
@@ -26,14 +31,23 @@ public class GameWorld implements Disposable {
     public Rectangle visibleArea;
     private float width, height;
 
+    private boolean paused;
+    private final Color pauseColor = Color.GRAY;
+    private final BitmapFontCache pauseText;
+
     private int maxCount = 0;
 
     private float time = 0;
     private int score = 0;
 
     public GameWorld() {
+        final AssetManager assets = Main.getInstance().assets();
+
         visibleArea = new Rectangle();
         tree = new BSPTree(0, 0, 0, 0);
+
+        pauseText = new BitmapFontCache(assets.get("ui/uiskin.json", Skin.class).getFont("default-font"));
+        pauseText.setText("PAUSE", 100, 100);
     }
 
     public void initialize(float height) {}
@@ -60,30 +74,49 @@ public class GameWorld implements Disposable {
     }
 
     public void update(float delta) {
-        time += delta;
-//        visibleArea.set(0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
-//        tree.resetAndMove(0, 0);
+        if (!paused) {
+            time += delta;
+//          visibleArea.set(0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
+//          tree.resetAndMove(0, 0);
 
-        for (GameObject gameObject : gameObjects) {
-            gameObject.update(delta);
-            if (gameObject.active && gameObject.colliding) {
-//                tree.addObject(gameObject);
+            for (GameObject gameObject : gameObjects) {
+                gameObject.update(delta);
+                if (gameObject.active && gameObject.colliding) {
+//                  tree.addObject(gameObject);
+                }
             }
-        }
 
-        detectCollisions();
+            detectCollisions();
 
-        eventProcessor.process();
+            eventProcessor.process();
 
-        if (time > 2) {
-            time = 0;
-            Gdx.app.log("GameWorld", gameObjects.size + " objects in the world of maximum " + maxCount);
+            if (time > 2) {
+                time = 0;
+                Gdx.app.log("GameWorld", gameObjects.size + " objects in the world of maximum " + maxCount);
+            }
         }
     }
 
     public void render(Batch batch) {
-        for (GameObject gameObject : gameObjects) {
-            gameObject.render(batch);
+        final Color origColor = TEMP_COLOR.set(batch.getColor());
+        if (paused)
+            batch.setColor(pauseColor);
+
+        if (paused) {
+            for (GameObject gameObject : gameObjects) {
+                gameObject.sprite.setColor(pauseColor);
+                gameObject.render(batch);
+                gameObject.sprite.setColor(Color.WHITE);
+            }
+        } else {
+            for (GameObject gameObject : gameObjects) {
+                gameObject.render(batch);
+            }
+        }
+
+        if (paused) {
+            pauseText.draw(batch);
+            batch.setColor(origColor);
         }
     }
 
@@ -103,10 +136,8 @@ public class GameWorld implements Disposable {
 //        return visibleArea.y + visibleArea.height;
 //    }
 
-    public void gameOver() {
-        AbstractScreen screen = Main.getInstance().getCurrentScreen();
-        Main.getInstance().goToMainMenu();
-        screen.dispose();
+    public void pause() {
+        this.paused = !this.paused;
     }
 
     public void registerHandler(String type, EventHandler handler) {
