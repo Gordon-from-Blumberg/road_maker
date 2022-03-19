@@ -1,5 +1,6 @@
 package com.gordonfromblumberg.games.core.common.model;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -12,6 +13,7 @@ import com.badlogic.gdx.utils.Pool;
 
 import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.utils.Poolable;
+import com.gordonfromblumberg.games.core.common.world.GameWorld;
 
 @SuppressWarnings("rawtypes")
 public class GameObject implements Disposable, Poolable {
@@ -23,8 +25,6 @@ public class GameObject implements Disposable, Poolable {
     protected static final int Y3 = 5;
     protected static final int X4 = 6;
     protected static final int Y4 = 7;
-
-    protected static int nextId = 1;
 
     protected int id;
 
@@ -135,6 +135,30 @@ public class GameObject implements Disposable, Poolable {
     public void collide(GameObject other) {
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public Color getColor() {
+        return sprite.getColor();
+    }
+
+    public void setColor(Color color) {
+        sprite.setColor(color);
+    }
+
+    public Sprite getSprite() {
+        return sprite;
+    }
+
     @SuppressWarnings("unchecked")
     public void free() {
         if (pool != null)
@@ -149,6 +173,8 @@ public class GameObject implements Disposable, Poolable {
     @Override
     public void reset() {
         id = -1;
+        active = false;
+        gameWorld = null;
         setPosition(0, 0);
         polygon.setRotation(0);
     }

@@ -11,12 +11,14 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
-import com.gordonfromblumberg.games.core.common.model.GameWorld;
 import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
+import com.gordonfromblumberg.games.core.common.world.GameWorld;
+import com.gordonfromblumberg.games.core.common.world.GameWorldRenderer;
 
 public class GameScreen extends AbstractScreen {
     TextureRegion background;
     private GameWorld gameWorld;
+    private GameWorldRenderer renderer;
 
     private final Vector3 coords = new Vector3();
 
@@ -24,6 +26,7 @@ public class GameScreen extends AbstractScreen {
         super(batch);
 
         gameWorld = new GameWorld();
+        renderer = new GameWorldRenderer(gameWorld);
     }
 
     @Override
@@ -34,7 +37,7 @@ public class GameScreen extends AbstractScreen {
                 .get("image/texture_pack.atlas", TextureAtlas.class)
                 .findRegion("background");
 
-        gameWorld.initialize(viewport.getWorldHeight());
+        gameWorld.initialize();
 
         stage.addListener(new InputListener() {
             @Override
@@ -71,7 +74,7 @@ public class GameScreen extends AbstractScreen {
     @Override
     protected void renderWorld(float delta) {
         batch.draw(background, 0, 0);
-        gameWorld.render(batch);
+        renderer.render(batch);
     }
 
 //    @Override

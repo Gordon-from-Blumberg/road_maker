@@ -1,4 +1,4 @@
-package com.gordonfromblumberg.games.core.common.model;
+package com.gordonfromblumberg.games.core.common.world;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -16,12 +16,14 @@ import com.gordonfromblumberg.games.core.common.event.Event;
 import com.gordonfromblumberg.games.core.common.event.EventHandler;
 import com.gordonfromblumberg.games.core.common.event.EventProcessor;
 import com.gordonfromblumberg.games.core.common.screens.AbstractScreen;
+import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
+import com.gordonfromblumberg.games.core.common.model.GameObject;
 import com.gordonfromblumberg.games.core.common.utils.BSPTree;
 
 import java.util.Iterator;
 
 public class GameWorld implements Disposable {
-    private static final Color TEMP_COLOR = new Color();
+    private static int nextId = 1;
 
     private final Array<GameObject> gameObjects = new Array<>();
 
@@ -31,9 +33,9 @@ public class GameWorld implements Disposable {
     public Rectangle visibleArea;
     private float width, height;
 
-    private boolean paused;
+    boolean paused;
     private final Color pauseColor = Color.GRAY;
-    private final BitmapFontCache pauseText;
+    final BitmapFontCache pauseText;
 
     private int maxCount = 0;
 
@@ -49,8 +51,8 @@ public class GameWorld implements Disposable {
         pauseText = new BitmapFontCache(assets.get("ui/uiskin.json", Skin.class).getFont("default-font"));
         pauseText.setText("PAUSE", 100, 100);
     }
-
-    public void initialize(float height) {}
+    public void initialize() {
+    }
 
     public void setSize(float width, float height) {
         this.width = width;
@@ -61,16 +63,18 @@ public class GameWorld implements Disposable {
     public void addGameObject(GameObject gameObject) {
         gameObjects.add(gameObject);
         gameObject.setGameWorld(this);
-        gameObject.active = true;
-        gameObject.id = GameObject.nextId++;
+        gameObject.setActive(true);
+        gameObject.setId(nextId++);
         if (gameObjects.size > maxCount) maxCount = gameObjects.size;
     }
 
     public void removeGameObject(GameObject gameObject) {
         gameObjects.removeValue(gameObject, true);
-        gameObject.setGameWorld(null);
-        gameObject.active = false;
         gameObject.release();
+    }
+
+    public Array<GameObject> getGameObjects() {
+        return gameObjects;
     }
 
     public void update(float delta) {
@@ -81,7 +85,7 @@ public class GameWorld implements Disposable {
 
             for (GameObject gameObject : gameObjects) {
                 gameObject.update(delta);
-                if (gameObject.active && gameObject.colliding) {
+                if (gameObject.isActive()) {
 //                  tree.addObject(gameObject);
                 }
             }
@@ -97,30 +101,7 @@ public class GameWorld implements Disposable {
         }
     }
 
-    public void render(Batch batch) {
-        final Color origColor = TEMP_COLOR.set(batch.getColor());
-        if (paused)
-            batch.setColor(pauseColor);
-
-        if (paused) {
-            for (GameObject gameObject : gameObjects) {
-                gameObject.sprite.setColor(pauseColor);
-                gameObject.render(batch);
-                gameObject.sprite.setColor(Color.WHITE);
-            }
-        } else {
-            for (GameObject gameObject : gameObjects) {
-                gameObject.render(batch);
-            }
-        }
-
-        if (paused) {
-            pauseText.draw(batch);
-            batch.setColor(origColor);
-        }
-    }
-
-//    public float getMinVisibleX() {
+    //    public float getMinVisibleX() {
 //        return visibleArea.x;
 //    }
 //
@@ -154,12 +135,12 @@ public class GameWorld implements Disposable {
             final Iterator<GameObject> internalIterator = tree.internalIterator();
             while (iterator.hasNext()) {
                 final GameObject gameObject = iterator.next();
-                if (!gameObject.active)
+                if (!gameObject.isActive())
                     continue;
 
                 while (internalIterator.hasNext()) {
                     final GameObject internalGameObject = internalIterator.next();
-                    if (!internalGameObject.active)
+                    if (!internalGameObject.isActive())
                         continue;
 
                     if (detectCollision(gameObject, internalGameObject)) {
