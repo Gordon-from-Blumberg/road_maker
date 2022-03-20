@@ -3,13 +3,11 @@ package com.gordonfromblumberg.games.core.common.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
 import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
 import com.gordonfromblumberg.games.core.common.world.GameWorld;
@@ -20,6 +18,7 @@ public class GameScreen extends AbstractScreen {
     private GameWorldRenderer renderer;
 
     private final Vector3 coords = new Vector3();
+    private Label cameraPos, zoom;
 
     protected GameScreen(SpriteBatch batch) {
         super(batch);
@@ -39,9 +38,12 @@ public class GameScreen extends AbstractScreen {
         stage.addListener(new InputListener() {
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY) {
-                camera.zoom += amountY * 0.25;
-                if (camera.zoom <= 0)
-                    camera.zoom = 0.25f;
+                if (amountY > 0)
+                    camera.zoom *= 1.25f;
+                else if (amountY < 0)
+                    camera.zoom /= 1.25f;
+                if (camera.zoom <= 0.1f)
+                    camera.zoom = 0.1f;
                 return true;
             }
         });
@@ -49,17 +51,20 @@ public class GameScreen extends AbstractScreen {
 
     @Override
     protected void update(float delta) {
+        float cameraSpeed = 8 * camera.zoom;
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
-            camera.translate(-10, 0);
+            camera.translate(-cameraSpeed, 0);
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
-            camera.translate(10, 0);
+            camera.translate(cameraSpeed, 0);
         if (Gdx.input.isKeyPressed(Input.Keys.UP))
-            camera.translate(0, 10);
+            camera.translate(0, cameraSpeed);
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
-            camera.translate(0, -10);
+            camera.translate(0, -cameraSpeed);
 
         super.update(delta);            // apply camera moving and update batch projection matrix
         gameWorld.update(delta);        // update game state
+        cameraPos.setText("Camera pos: " + camera.position.x + ", " + camera.position.y);
+        zoom.setText("Zoom: " + camera.zoom);
     }
 
     @Override
@@ -85,5 +90,14 @@ public class GameScreen extends AbstractScreen {
                 return false;
             }
         });
+
+        cameraPos = new Label("Hello", uiSkin);
+        zoom = new Label("", uiSkin);
+        uiRootTable.add(cameraPos);
+        uiRootTable.row();
+        uiRootTable.add(zoom);
+        uiRootTable.row().expandY();
+        uiRootTable.add();
+        uiRootTable.add().expandX();
     }
 }

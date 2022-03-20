@@ -62,9 +62,11 @@ public class GameWorld implements Disposable {
         final AssetManager assets = Main.getInstance().assets();
         final RandomUtils.RandomGen rand = RandomUtils.randomGen(100389 + 90492);
         map = new TiledMap();
-        TiledMapTileLayer layer = new TiledMapTileLayer(10, 10, 48,32);
-        for (int i = 0; i < 10; ++i) {
-            for (int j = 0; j < 10; ++j) {
+        int width = 20;
+        int height = 20;
+        TiledMapTileLayer layer = new TiledMapTileLayer(width, height, 48, 32);
+        for (int i = 0; i < width; ++i) {
+            for (int j = 0; j < height; ++j) {
                 TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
                 int randTile = rand.nextInt(1, 4);
                 cell.setTile(new StaticTiledMapTile(assets
@@ -74,6 +76,8 @@ public class GameWorld implements Disposable {
             }
         }
         map.getLayers().add(layer);
+
+
     }
 
     public void setSize(float width, float height) {

@@ -45,6 +45,8 @@ public class GameWorldRenderer extends FBORenderer {
                 .findRegion("background");
 
         this.mapRenderer = new IsometricTiledMapRenderer(world.map, batch);
+        TiledMapTileLayer l = (TiledMapTileLayer) world.map.getLayers().get(0);
+        viewport.getCamera().position.set(l.getWidth() * l.getTileWidth() / 2f, 0, 0);
     }
 
     @Override
