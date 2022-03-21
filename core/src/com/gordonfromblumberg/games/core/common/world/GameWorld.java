@@ -63,7 +63,7 @@ public class GameWorld implements Disposable {
         final RandomUtils.RandomGen rand = RandomUtils.randomGen(100389 + 90492);
         map = new TiledMap();
         int width = 20;
-        int height = 20;
+        int height = 40;
         TiledMapTileLayer layer = new TiledMapTileLayer(width, height, 48, 32);
         layer.setName("map");
         for (int i = 0; i < width; ++i) {

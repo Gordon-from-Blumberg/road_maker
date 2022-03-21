@@ -8,7 +8,9 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
+import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
@@ -22,6 +24,7 @@ public class GameWorldRenderer extends FBORenderer {
     private Viewport viewport;
     private final Rectangle worldArea = new Rectangle();
     private IsometricTiledMapRenderer mapRenderer;
+    private final Matrix3 projection = new Matrix3();
 
     private final Color pauseColor = Color.GRAY;
     private final Color tempClr1 = new Color(), tempClr2 = new Color();
@@ -45,8 +48,13 @@ public class GameWorldRenderer extends FBORenderer {
                 .findRegion("background");
 
         this.mapRenderer = new IsometricTiledMapRenderer(world.map, batch);
-        TiledMapTileLayer l = (TiledMapTileLayer) world.map.getLayers().get(0);
+        TiledMapTileLayer l = (TiledMapTileLayer) world.map.getLayers().get("map");
         viewport.getCamera().position.set(l.getWidth() * l.getTileWidth() / 2f, 0, 0);
+        projection.set(new float[] {
+                 1.0f / l.getTileWidth(),  1.0f / l.getTileWidth(),  0.0f,
+                -1.0f / l.getTileHeight(), 1.0f / l.getTileHeight(), 0.0f,
+                 0.5f,                    -0.5f,                     1.0f
+        });
     }
 
     @Override
@@ -80,5 +88,11 @@ public class GameWorldRenderer extends FBORenderer {
         }
 
         batch.end();
+    }
+
+    // transforms viewport coordinates to isometric world
+    public void screenToWorld(Vector3 coords) {
+        coords.z = 1.0f;
+        coords.mul(projection);
     }
 }

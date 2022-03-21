@@ -3,6 +3,7 @@ package com.gordonfromblumberg.games.core.common.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -58,15 +59,15 @@ public class GameScreen extends AbstractScreen {
                 y = Gdx.input.getY();
                 screenCoord.setText("Screen " + x + ", " + y);
                 screenToWorld(x, y, coords3);
-//                worldCoord.setText("World " + coords3.x + ", " + coords3.y);
+                worldCoord.setText("World " + coords3.x + ", " + coords3.y);
             }
         });
     }
 
     void screenToWorld(float x, float y, Vector3 out) {
         viewport.unproject(coords3.set(x, y, 0));
-        viewCoord.setText("View " + coords3.x + ", " + coords3.y);
-        // todo
+        viewCoord.setText("Viewport " + coords3.x + ", " + coords3.y);
+        renderer.screenToWorld(coords3);
         out.set(coords3);
     }
 
