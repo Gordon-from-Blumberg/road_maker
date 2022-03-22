@@ -2,9 +2,12 @@ package com.gordonfromblumberg.games.core.common.world;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gordonfromblumberg.games.core.common.Main;
@@ -18,6 +21,7 @@ public class GameWorldRenderer extends FBORenderer {
     private final Batch batch;
     private Viewport viewport;
     private final Rectangle worldArea = new Rectangle();
+    private IsometricTiledMapRenderer mapRenderer;
 
     private final Color pauseColor = Color.GRAY;
     private final Color tempClr1 = new Color(), tempClr2 = new Color();
@@ -39,6 +43,8 @@ public class GameWorldRenderer extends FBORenderer {
         background = assets
                 .get("image/texture_pack.atlas", TextureAtlas.class)
                 .findRegion("background");
+
+        this.mapRenderer = new IsometricTiledMapRenderer(world.map, batch);
     }
 
     @Override
@@ -49,7 +55,10 @@ public class GameWorldRenderer extends FBORenderer {
             batch.setColor(pauseColor);
         }
 
-        batch.draw(background, 0, 0);
+//        batch.draw(background, 0, 0);
+
+        mapRenderer.setView((OrthographicCamera) viewport.getCamera());
+        mapRenderer.renderTileLayer((TiledMapTileLayer) world.map.getLayers().get(0));
 
         if (world.paused) {
             for (GameObject gameObject : world.getGameObjects()) {

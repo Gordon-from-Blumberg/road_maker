@@ -5,6 +5,10 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFontCache;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -19,6 +23,7 @@ import com.gordonfromblumberg.games.core.common.screens.AbstractScreen;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
 import com.gordonfromblumberg.games.core.common.model.GameObject;
 import com.gordonfromblumberg.games.core.common.utils.BSPTree;
+import com.gordonfromblumberg.games.core.common.utils.RandomUtils;
 
 import java.util.Iterator;
 
@@ -32,6 +37,8 @@ public class GameWorld implements Disposable {
 
     public Rectangle visibleArea;
     private float width, height;
+
+    TiledMap map;
 
     boolean paused;
     private final Color pauseColor = Color.GRAY;
@@ -52,6 +59,21 @@ public class GameWorld implements Disposable {
         pauseText.setText("PAUSE", 100, 100);
     }
     public void initialize() {
+        final AssetManager assets = Main.getInstance().assets();
+        final RandomUtils.RandomGen rand = RandomUtils.randomGen(100389 + 90492);
+        map = new TiledMap();
+        TiledMapTileLayer layer = new TiledMapTileLayer(10, 10, 48,32);
+        for (int i = 0; i < 10; ++i) {
+            for (int j = 0; j < 10; ++j) {
+                TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
+                int randTile = rand.nextInt(1, 4);
+                cell.setTile(new StaticTiledMapTile(assets
+                        .get("image/texture_pack.atlas", TextureAtlas.class)
+                        .findRegion("tile2" + randTile)));
+                layer.setCell(i, j, cell);
+            }
+        }
+        map.getLayers().add(layer);
     }
 
     public void setSize(float width, float height) {
