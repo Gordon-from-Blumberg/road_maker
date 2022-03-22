@@ -3,11 +3,13 @@ package com.gordonfromblumberg.games.core.common.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
 import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
 import com.gordonfromblumberg.games.core.common.world.GameWorld;
@@ -17,8 +19,9 @@ public class GameScreen extends AbstractScreen {
     private GameWorld gameWorld;
     private GameWorldRenderer renderer;
 
-    private final Vector3 coords = new Vector3();
-    private Label cameraPos, zoom;
+    private final Vector2 coords2 = new Vector2();
+    private final Vector3 coords3 = new Vector3();
+    private Label cameraPos, zoom, screenCoord, viewCoord, worldCoord;
 
     protected GameScreen(SpriteBatch batch) {
         super(batch);
@@ -47,6 +50,24 @@ public class GameScreen extends AbstractScreen {
                 return true;
             }
         });
+
+        stage.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                x = Gdx.input.getX();
+                y = Gdx.input.getY();
+                screenCoord.setText("Screen " + x + ", " + y);
+                screenToWorld(x, y, coords3);
+//                worldCoord.setText("World " + coords3.x + ", " + coords3.y);
+            }
+        });
+    }
+
+    void screenToWorld(float x, float y, Vector3 out) {
+        viewport.unproject(coords3.set(x, y, 0));
+        viewCoord.setText("View " + coords3.x + ", " + coords3.y);
+        // todo
+        out.set(coords3);
     }
 
     @Override
@@ -93,9 +114,18 @@ public class GameScreen extends AbstractScreen {
 
         cameraPos = new Label("Hello", uiSkin);
         zoom = new Label("", uiSkin);
+        screenCoord = new Label("Screen", uiSkin);
+        viewCoord = new Label("View", uiSkin);
+        worldCoord = new Label("World", uiSkin);
+
         uiRootTable.add(cameraPos);
-        uiRootTable.row();
         uiRootTable.add(zoom);
+        uiRootTable.row();
+        uiRootTable.add(screenCoord);
+        uiRootTable.row();
+        uiRootTable.add(viewCoord);
+        uiRootTable.row();
+        uiRootTable.add(worldCoord);
         uiRootTable.row().expandY();
         uiRootTable.add();
         uiRootTable.add().expandX();

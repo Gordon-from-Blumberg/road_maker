@@ -65,6 +65,7 @@ public class GameWorld implements Disposable {
         int width = 20;
         int height = 20;
         TiledMapTileLayer layer = new TiledMapTileLayer(width, height, 48, 32);
+        layer.setName("map");
         for (int i = 0; i < width; ++i) {
             for (int j = 0; j < height; ++j) {
                 TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
