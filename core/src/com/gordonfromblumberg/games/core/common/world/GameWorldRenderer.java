@@ -13,7 +13,6 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gordonfromblumberg.games.core.common.Main;
-import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
 import com.gordonfromblumberg.games.core.common.screens.FBORenderer;
 import com.gordonfromblumberg.games.core.common.model.GameObject;
 
@@ -24,7 +23,8 @@ public class GameWorldRenderer extends FBORenderer {
     private Viewport viewport;
     private final Rectangle worldArea = new Rectangle();
     private IsometricTiledMapRenderer mapRenderer;
-    private final Matrix3 projection = new Matrix3();
+    private final Matrix3 viewToWorld = new Matrix3();
+    private final Matrix3 worldToView = new Matrix3();
 
     private final Color pauseColor = Color.GRAY;
     private final Color tempClr1 = new Color(), tempClr2 = new Color();
@@ -50,11 +50,12 @@ public class GameWorldRenderer extends FBORenderer {
         this.mapRenderer = new IsometricTiledMapRenderer(world.map, batch);
         TiledMapTileLayer l = (TiledMapTileLayer) world.map.getLayers().get("map");
         viewport.getCamera().position.set(l.getWidth() * l.getTileWidth() / 2f, 0, 0);
-        projection.set(new float[] {
+        viewToWorld.set(new float[] {
                  1.0f / l.getTileWidth(),  1.0f / l.getTileWidth(),  0.0f,
                 -1.0f / l.getTileHeight(), 1.0f / l.getTileHeight(), 0.0f,
                  0.5f,                    -0.5f,                     1.0f
         });
+        worldToView.set(viewToWorld).inv();
     }
 
     @Override
@@ -93,6 +94,12 @@ public class GameWorldRenderer extends FBORenderer {
     // transforms viewport coordinates to isometric world
     public void screenToWorld(Vector3 coords) {
         coords.z = 1.0f;
-        coords.mul(projection);
+        coords.mul(viewToWorld);
+    }
+
+    // transforms isometric world to viewport coordinates
+    public void worldToScreen(Vector3 coords) {
+        coords.z = 1.0f;
+        coords.mul(worldToView);
     }
 }

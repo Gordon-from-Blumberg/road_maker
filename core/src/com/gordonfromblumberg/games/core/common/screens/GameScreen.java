@@ -22,7 +22,7 @@ public class GameScreen extends AbstractScreen {
 
     private final Vector2 coords2 = new Vector2();
     private final Vector3 coords3 = new Vector3();
-    private Label cameraPos, zoom, screenCoord, viewCoord, worldCoord;
+    private Label cameraPos, zoom, screenCoord, viewCoord, worldCoord, viewFromWorldCoord;
 
     protected GameScreen(SpriteBatch batch) {
         super(batch);
@@ -57,16 +57,18 @@ public class GameScreen extends AbstractScreen {
             public void clicked(InputEvent event, float x, float y) {
                 x = Gdx.input.getX();
                 y = Gdx.input.getY();
-                screenCoord.setText("Screen " + x + ", " + y);
+                screenCoord.setText(x + ", " + y);
                 screenToWorld(x, y, coords3);
-                worldCoord.setText("World " + coords3.x + ", " + coords3.y);
+                worldCoord.setText(coords3.x + ", " + coords3.y);
+                renderer.worldToScreen(coords3);
+                viewFromWorldCoord.setText(coords3.x + ", " + coords3.y);
             }
         });
     }
 
     void screenToWorld(float x, float y, Vector3 out) {
         viewport.unproject(coords3.set(x, y, 0));
-        viewCoord.setText("Viewport " + coords3.x + ", " + coords3.y);
+        viewCoord.setText(coords3.x + ", " + coords3.y);
         renderer.screenToWorld(coords3);
         out.set(coords3);
     }
@@ -85,8 +87,8 @@ public class GameScreen extends AbstractScreen {
 
         super.update(delta);            // apply camera moving and update batch projection matrix
         gameWorld.update(delta);        // update game state
-        cameraPos.setText("Camera pos: " + camera.position.x + ", " + camera.position.y);
-        zoom.setText("Zoom: " + camera.zoom);
+        cameraPos.setText(camera.position.x + ", " + camera.position.y);
+        zoom.setText("" + camera.zoom);
     }
 
     @Override
@@ -115,20 +117,31 @@ public class GameScreen extends AbstractScreen {
 
         cameraPos = new Label("Hello", uiSkin);
         zoom = new Label("", uiSkin);
-        screenCoord = new Label("Screen", uiSkin);
-        viewCoord = new Label("View", uiSkin);
-        worldCoord = new Label("World", uiSkin);
+        screenCoord = new Label("", uiSkin);
+        viewCoord = new Label("", uiSkin);
+        worldCoord = new Label("", uiSkin);
+        viewFromWorldCoord = new Label("", uiSkin);
 
+        uiRootTable.add(new Label("Camera pos", uiSkin));
         uiRootTable.add(cameraPos);
+        uiRootTable.row();
+        uiRootTable.add(new Label("Zoom", uiSkin));
         uiRootTable.add(zoom);
         uiRootTable.row();
+        uiRootTable.add(new Label("Screen", uiSkin));
         uiRootTable.add(screenCoord);
         uiRootTable.row();
+        uiRootTable.add(new Label("Viewport", uiSkin));
         uiRootTable.add(viewCoord);
         uiRootTable.row();
+        uiRootTable.add(new Label("World", uiSkin));
         uiRootTable.add(worldCoord);
-        uiRootTable.row().expandY();
+        uiRootTable.row();
+        uiRootTable.add(new Label("View from world", uiSkin));
+        uiRootTable.add(viewFromWorldCoord);
+        uiRootTable.row();
         uiRootTable.add();
-        uiRootTable.add().expandX();
+        uiRootTable.add();
+        uiRootTable.add().expand();
     }
 }
