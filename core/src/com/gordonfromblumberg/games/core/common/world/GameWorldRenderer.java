@@ -11,8 +11,11 @@ import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gordonfromblumberg.games.core.common.Main;
+import com.gordonfromblumberg.games.core.common.animation.AnimatedParameterFloat;
+import com.gordonfromblumberg.games.core.common.animation.GbAnimation;
 import com.gordonfromblumberg.games.core.common.screens.FBORenderer;
 import com.gordonfromblumberg.games.core.common.model.GameObject;
 
@@ -25,6 +28,9 @@ public class GameWorldRenderer extends FBORenderer {
     private IsometricTiledMapRenderer mapRenderer;
     private final Matrix3 viewToWorld = new Matrix3();
     private final Matrix3 worldToView = new Matrix3();
+
+    private final AnimatedParameterFloat clickCircle = AnimatedParameterFloat.getInstance();
+    final Array<GbAnimation> clickAnimations = new Array<>();
 
     private final Color pauseColor = Color.GRAY;
     private final Color tempClr1 = new Color(), tempClr2 = new Color();
@@ -56,6 +62,9 @@ public class GameWorldRenderer extends FBORenderer {
                  0.5f,                    -0.5f,                     1.0f
         });
         worldToView.set(viewToWorld).inv();
+
+        clickCircle.addStop(0, 0);
+        clickCircle.addStop(1, 1);
     }
 
     @Override

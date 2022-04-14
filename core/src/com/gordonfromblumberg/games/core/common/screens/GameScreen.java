@@ -60,6 +60,7 @@ public class GameScreen extends AbstractScreen {
                 screenCoord.setText(x + ", " + y);
                 screenToWorld(x, y, coords3);
                 worldCoord.setText(coords3.x + ", " + coords3.y);
+                gameWorld.click(coords3.x, coords3.y);
                 renderer.worldToScreen(coords3);
                 viewFromWorldCoord.setText(coords3.x + ", " + coords3.y);
             }

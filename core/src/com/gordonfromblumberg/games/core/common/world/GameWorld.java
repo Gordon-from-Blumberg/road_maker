@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 
 import com.gordonfromblumberg.games.core.common.Main;
+import com.gordonfromblumberg.games.core.common.animation.GbAnimation;
 import com.gordonfromblumberg.games.core.common.event.Event;
 import com.gordonfromblumberg.games.core.common.event.EventHandler;
 import com.gordonfromblumberg.games.core.common.event.EventProcessor;
@@ -34,6 +35,7 @@ public class GameWorld implements Disposable {
 
     private final BSPTree tree;
     private final EventProcessor eventProcessor = new EventProcessor();
+    private final Array<GbAnimation> animations = new Array<>();
 
     public Rectangle visibleArea;
     private float width, height;
@@ -117,6 +119,10 @@ public class GameWorld implements Disposable {
                 }
             }
 
+            for (GbAnimation animation : animations) {
+                animation.update(delta);
+            }
+
             detectCollisions();
 
             eventProcessor.process();
@@ -126,6 +132,11 @@ public class GameWorld implements Disposable {
                 Gdx.app.log("GameWorld", gameObjects.size + " objects in the world of maximum " + maxCount);
             }
         }
+    }
+
+    // world coords
+    public void click(float x, float y) {
+
     }
 
     //    public float getMinVisibleX() {
