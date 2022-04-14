@@ -1,11 +1,13 @@
 package com.gordonfromblumberg.games.core.common.world;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.math.Matrix3;
@@ -19,21 +21,24 @@ import com.gordonfromblumberg.games.core.common.animation.GbAnimation;
 import com.gordonfromblumberg.games.core.common.screens.FBORenderer;
 import com.gordonfromblumberg.games.core.common.model.GameObject;
 
+import java.util.Iterator;
+
 public class GameWorldRenderer extends FBORenderer {
     private static final Color TEMP_COLOR = new Color();
+    private static final Vector3 tempVec3 = new Vector3();
+
     private final GameWorld world;
     private final Batch batch;
     private Viewport viewport;
     private final Rectangle worldArea = new Rectangle();
     private IsometricTiledMapRenderer mapRenderer;
+    private final ShapeRenderer shapeRenderer = new ShapeRenderer();
     private final Matrix3 viewToWorld = new Matrix3();
     private final Matrix3 worldToView = new Matrix3();
 
-    private final AnimatedParameterFloat clickCircle = AnimatedParameterFloat.getInstance();
-    final Array<GbAnimation> clickAnimations = new Array<>();
+    final Array<ClickPoint> clickPoints = new Array<>();
 
     private final Color pauseColor = Color.GRAY;
-    private final Color tempClr1 = new Color(), tempClr2 = new Color();
     TextureRegion background;
 
     public GameWorldRenderer(GameWorld world, Batch batch, Viewport viewport) {
@@ -63,8 +68,7 @@ public class GameWorldRenderer extends FBORenderer {
         });
         worldToView.set(viewToWorld).inv();
 
-        clickCircle.addStop(0, 0);
-        clickCircle.addStop(1, 1);
+        world.onClick = this::click;
     }
 
     @Override
@@ -90,6 +94,30 @@ public class GameWorldRenderer extends FBORenderer {
             for (GameObject gameObject : world.getGameObjects()) {
                 gameObject.render(batch);
             }
+            batch.end();
+
+            shapeRenderer.setProjectionMatrix(viewport.getCamera().combined);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+            shapeRenderer.setColor(0f, 1f, 0f, 1f);
+            final Iterator<ClickPoint> it = clickPoints.iterator();
+            while (it.hasNext()) {
+                ClickPoint cp = it.next();
+                worldToScreen(tempVec3.set(cp.x, cp.y, 1));
+                cp.animation.update(dt);
+                final float circleMul = cp.getCircle();
+                Gdx.app.log("RENDER", "render click at " + cp.x + ", " + cp.y + ", mul = " + circleMul);
+                final float clickWidth = circleMul * ClickPoint.WIDTH;
+                final float clickHeight = circleMul * ClickPoint.HEIGHT;
+                shapeRenderer.ellipse(cp.x - clickWidth / 2, cp.y - clickHeight / 2, clickWidth, clickHeight);
+
+                if (cp.animation.isFinished()) {
+                    it.remove();
+                    cp.release();
+                }
+            }
+            shapeRenderer.end();
+
+            batch.begin();
         }
 
         if (world.paused) {
@@ -110,5 +138,11 @@ public class GameWorldRenderer extends FBORenderer {
     public void worldToScreen(Vector3 coords) {
         coords.z = 1.0f;
         coords.mul(worldToView);
+    }
+
+    void click(float x, float y) {
+        worldToScreen(tempVec3.set(x, y, 1));
+        ClickPoint cp = ClickPoint.getInstance();
+        clickPoints.add(cp.init(tempVec3.x, tempVec3.y));
     }
 }

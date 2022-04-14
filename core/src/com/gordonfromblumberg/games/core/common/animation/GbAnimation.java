@@ -24,8 +24,19 @@ public class GbAnimation implements Poolable {
         return pool.obtain();
     }
 
+    public GbAnimation addFloat(AnimatedParameterFloat parameterFloat) {
+        floats.add(parameterFloat);
+        return this;
+    }
+
+    public GbAnimation addFloat(int index, AnimatedParameterFloat parameterFloat) {
+        floats.insert(index, parameterFloat);
+        return this;
+    }
+
     public void update(float dt) {
         runningTime += dt;
+        process = runningTime / duration;
     }
 
     public float getFloat(int index) {
@@ -36,8 +47,9 @@ public class GbAnimation implements Poolable {
         return runningTime >= duration;
     }
 
-    public void setDuration(float duration) {
+    public GbAnimation setDuration(float duration) {
         this.duration = duration;
+        return this;
     }
 
     @Override

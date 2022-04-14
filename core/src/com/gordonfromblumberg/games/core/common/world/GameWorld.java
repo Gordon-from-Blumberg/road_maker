@@ -24,6 +24,8 @@ import com.gordonfromblumberg.games.core.common.screens.AbstractScreen;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
 import com.gordonfromblumberg.games.core.common.model.GameObject;
 import com.gordonfromblumberg.games.core.common.utils.BSPTree;
+import com.gordonfromblumberg.games.core.common.utils.BiFloatConsumer;
+import com.gordonfromblumberg.games.core.common.utils.FloatConsumer;
 import com.gordonfromblumberg.games.core.common.utils.RandomUtils;
 
 import java.util.Iterator;
@@ -35,7 +37,6 @@ public class GameWorld implements Disposable {
 
     private final BSPTree tree;
     private final EventProcessor eventProcessor = new EventProcessor();
-    private final Array<GbAnimation> animations = new Array<>();
 
     public Rectangle visibleArea;
     private float width, height;
@@ -50,6 +51,8 @@ public class GameWorld implements Disposable {
 
     private float time = 0;
     private int score = 0;
+
+    BiFloatConsumer onClick;
 
     public GameWorld() {
         final AssetManager assets = Main.getInstance().assets();
@@ -114,13 +117,9 @@ public class GameWorld implements Disposable {
 
             for (GameObject gameObject : gameObjects) {
                 gameObject.update(delta);
-                if (gameObject.isActive()) {
+//                if (gameObject.isActive()) {
 //                  tree.addObject(gameObject);
-                }
-            }
-
-            for (GbAnimation animation : animations) {
-                animation.update(delta);
+//                }
             }
 
             detectCollisions();
@@ -136,7 +135,8 @@ public class GameWorld implements Disposable {
 
     // world coords
     public void click(float x, float y) {
-
+        if (onClick != null)
+            onClick.accept(x, y);
     }
 
     //    public float getMinVisibleX() {
