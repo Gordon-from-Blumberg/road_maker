@@ -38,6 +38,8 @@ public class GameObject implements Disposable, Poolable {
     protected boolean active = false;
     protected boolean colliding = false;
 
+    protected boolean flippedX, flippedY;
+
     protected GameObject() {
     }
 
@@ -151,6 +153,26 @@ public class GameObject implements Disposable, Poolable {
 
     public Sprite getSprite() {
         return sprite;
+    }
+
+    // 0 - x, 1 - y, 2 - both x and y
+    public boolean isFlipped(int axis) {
+        switch (axis) {
+            case 0:
+                return flippedX;
+            case 1:
+                return flippedY;
+            case 2:
+                return flippedX && flippedY;
+            default:
+                throw new IllegalArgumentException("Only 0, 1, 2 allowed, but " + axis + " is passed");
+        }
+    }
+
+    public void flip(boolean x, boolean y) {
+        sprite.flip(x != flippedX, y != flippedY);
+        flippedX = x;
+        flippedY = y;
     }
 
     @Override
