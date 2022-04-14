@@ -35,16 +35,10 @@ public class GameObject implements Disposable, Poolable {
     public final Vector2 position = new Vector2();
     protected float width, height;
 
-    protected final Pool pool;
     protected boolean active = false;
     protected boolean colliding = false;
 
     protected GameObject() {
-        pool = null;
-    }
-
-    protected GameObject(Pool pool) {
-        this.pool = pool;
     }
 
     public int getId() {
@@ -159,12 +153,6 @@ public class GameObject implements Disposable, Poolable {
         return sprite;
     }
 
-    @SuppressWarnings("unchecked")
-    public void free() {
-        if (pool != null)
-            pool.free(this);
-    }
-
     @Override
     public String toString() {
         return getClass().getSimpleName() + "#" + id;
@@ -179,9 +167,7 @@ public class GameObject implements Disposable, Poolable {
         polygon.setRotation(0);
     }
 
-    public void release() {
-        pool.free(this);
-    }
+    public void release() {}
 
     @Override
     public void dispose() {
