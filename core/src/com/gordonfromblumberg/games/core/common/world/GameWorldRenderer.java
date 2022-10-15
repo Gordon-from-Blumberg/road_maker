@@ -128,13 +128,17 @@ public class GameWorldRenderer extends FBORenderer {
         batch.end();
     }
 
-    // transforms viewport coordinates to isometric world
+    /**
+     * Transforms viewport coordinates to isometric world
+     */
     public void screenToWorld(Vector3 coords) {
         coords.z = 1.0f;
         coords.mul(viewToWorld);
     }
 
-    // transforms isometric world to viewport coordinates
+    /**
+     * Transforms isometric world to viewport coordinates
+     */
     public void worldToScreen(Vector3 coords) {
         coords.z = 1.0f;
         coords.mul(worldToView);
