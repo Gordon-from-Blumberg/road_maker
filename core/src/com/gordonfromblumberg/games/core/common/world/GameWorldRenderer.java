@@ -67,8 +67,6 @@ public class GameWorldRenderer extends FBORenderer {
                  0.5f,                    -0.5f,                     1.0f
         });
         worldToView.set(viewToWorld).inv();
-
-        world.onClick = this::click;
     }
 
     @Override

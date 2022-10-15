@@ -16,16 +16,12 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 
 import com.gordonfromblumberg.games.core.common.Main;
-import com.gordonfromblumberg.games.core.common.animation.GbAnimation;
 import com.gordonfromblumberg.games.core.common.event.Event;
 import com.gordonfromblumberg.games.core.common.event.EventHandler;
 import com.gordonfromblumberg.games.core.common.event.EventProcessor;
-import com.gordonfromblumberg.games.core.common.screens.AbstractScreen;
-import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
+import com.gordonfromblumberg.games.core.common.utils.ClickHandler;
 import com.gordonfromblumberg.games.core.common.model.GameObject;
 import com.gordonfromblumberg.games.core.common.utils.BSPTree;
-import com.gordonfromblumberg.games.core.common.utils.BiFloatConsumer;
-import com.gordonfromblumberg.games.core.common.utils.FloatConsumer;
 import com.gordonfromblumberg.games.core.common.utils.RandomUtils;
 
 import java.util.Iterator;
@@ -52,7 +48,7 @@ public class GameWorld implements Disposable {
     private float time = 0;
     private int score = 0;
 
-    BiFloatConsumer onClick;
+    final Array<ClickHandler> clickHandlers = new Array<>(1);
 
     public GameWorld() {
         final AssetManager assets = Main.getInstance().assets();
@@ -134,9 +130,13 @@ public class GameWorld implements Disposable {
     }
 
     // world coords
-    public void click(float x, float y) {
-        if (onClick != null)
-            onClick.accept(x, y);
+    public void click(int button, float x, float y) {
+        for (ClickHandler handler : clickHandlers)
+            handler.onClick(button, x, y);
+    }
+
+    public void addClickHandler(ClickHandler handler) {
+        clickHandlers.add(handler);
     }
 
     //    public float getMinVisibleX() {
