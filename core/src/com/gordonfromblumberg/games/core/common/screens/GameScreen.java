@@ -2,15 +2,19 @@ package com.gordonfromblumberg.games.core.common.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
 import com.gordonfromblumberg.games.core.common.world.GameWorld;
 import com.gordonfromblumberg.games.core.common.world.GameWorldRenderer;
@@ -27,18 +31,18 @@ public class GameScreen extends AbstractScreen {
 
     protected GameScreen(SpriteBatch batch) {
         super(batch);
-
+        Gdx.app.log("INIT", "GameScreen constructor");
         gameWorld = new GameWorld();
     }
 
     @Override
     public void initialize() {
         super.initialize();
-
+        Gdx.app.log("INIT", "GameScreen init");
         final ConfigManager configManager = AbstractFactory.getInstance().configManager();
         gameWorld.initialize();
         worldRenderer = renderer = new GameWorldRenderer(gameWorld, batch, viewport);
-        renderer.initialize(viewport, viewport.getWorldHeight(), viewport.getWorldHeight());
+        renderer.initialize();
 
         final float minZoom = configManager.getFloat("minZoom");
         final float maxZoom = configManager.getFloat("maxZoom");
@@ -86,7 +90,7 @@ public class GameScreen extends AbstractScreen {
 
     void screenToViewport(float x, float y, Vector3 out) {
         viewport.unproject(coords3.set(x, y, 0));
-        viewCoord.setText(coords3.x + ", " + coords3.y);
+//        viewCoord.setText(coords3.x + ", " + coords3.y);
         out.set(coords3);
     }
 
@@ -119,6 +123,21 @@ public class GameScreen extends AbstractScreen {
         gameWorld.dispose();
 
         super.dispose();
+    }
+
+    @Override
+    protected void createUiRenderer() {
+        final ConfigManager configManager = AbstractFactory.getInstance().configManager();
+        final float worldWidth = configManager.getFloat("worldWidth");
+        final float minRatio = configManager.getFloat("minRatio");
+        final float maxRatio = configManager.getFloat("maxRatio");
+        final float minWorldHeight = worldWidth / maxRatio;
+        final float maxWorldHeight = worldWidth / minRatio;
+        OrthographicCamera camera = new OrthographicCamera();
+        camera.setToOrtho(false);
+        Viewport viewport = new ExtendViewport(worldWidth, minWorldHeight, worldWidth, maxWorldHeight, camera);
+        stage = new Stage(viewport, batch);
+        uiRenderer = new GameUIRenderer(viewport, stage, gameWorld, this::screenToViewport);
     }
 
     @Override

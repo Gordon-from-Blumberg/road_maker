@@ -3,7 +3,6 @@ package com.gordonfromblumberg.games.core.common.world;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFontCache;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -51,6 +50,7 @@ public class GameWorld implements Disposable {
     final Array<ClickHandler> clickHandlers = new Array<>(1);
 
     public GameWorld() {
+        Gdx.app.log("INIT", "GameWorld constructor");
         final AssetManager assets = Main.getInstance().assets();
 
         visibleArea = new Rectangle();
@@ -60,6 +60,7 @@ public class GameWorld implements Disposable {
         pauseText.setText("PAUSE", 100, 100);
     }
     public void initialize() {
+        Gdx.app.log("INIT", "GameWorld init");
         final AssetManager assets = Main.getInstance().assets();
         final RandomUtils.RandomGen rand = RandomUtils.randomGen(100389 + 90492);
         map = new TiledMap();

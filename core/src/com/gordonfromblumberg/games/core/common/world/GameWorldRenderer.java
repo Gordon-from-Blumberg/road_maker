@@ -43,16 +43,14 @@ public class GameWorldRenderer extends FBORenderer {
 
     public GameWorldRenderer(GameWorld world, Batch batch, Viewport viewport) {
         super(viewport);
-
+        Gdx.app.log("INIT", "GameWorldRenderer constructor");
         this.batch = batch;
         this.world = world;
     }
 
-    public void initialize(Viewport viewport, float width, float height) {
+    public void initialize() {
+        Gdx.app.log("INIT", "GameWorldRenderer init");
         final AssetManager assets = Main.getInstance().assets();
-
-        this.viewport = viewport;
-        worldArea.setSize(width, height);
 
         background = assets
                 .get("image/texture_pack.atlas", TextureAtlas.class)
