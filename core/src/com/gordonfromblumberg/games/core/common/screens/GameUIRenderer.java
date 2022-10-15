@@ -1,5 +1,6 @@
 package com.gordonfromblumberg.games.core.common.screens;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -14,6 +15,8 @@ public class GameUIRenderer extends UIRenderer {
 
     public GameUIRenderer(Viewport viewport, Stage stage, GameWorld world, CoordsConverter toGameViewConverter) {
         super(viewport, stage);
+
+        Gdx.app.log("INIT", "GameUIRenderer constructor");
 
         this.world = world;
         this.toGameViewConverter = toGameViewConverter;
