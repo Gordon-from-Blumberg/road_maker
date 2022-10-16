@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
+import com.gordonfromblumberg.games.core.common.ui.UIUtils;
 import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
 import com.gordonfromblumberg.games.core.common.world.GameWorld;
 import com.gordonfromblumberg.games.core.common.world.GameWorldRenderer;
@@ -132,6 +133,7 @@ public class GameScreen extends AbstractScreen {
         Gdx.app.log("INIT", "GameScreen.createUI");
 
         final ConfigManager configManager = AbstractFactory.getInstance().configManager();
+        final GameUIRenderer renderer = (GameUIRenderer) uiRenderer;
 
         final float minZoom = configManager.getFloat("minZoom");
         final float maxZoom = configManager.getFloat("maxZoom");
@@ -164,14 +166,15 @@ public class GameScreen extends AbstractScreen {
         });
 
         if (Main.DEBUG) {
-            uiRootTable.add(createCoordsDebugTable(uiSkin)).left().top();
+            uiRootTable.add(createCoordsDebugTable(uiSkin))
+                    .left().top();
         } else {
             uiRootTable.add();
         }
     }
 
     private Table createCoordsDebugTable(Skin uiSkin) {
-        final Table table = new Table();
+        final Table table = UIUtils.createTable();
         table.add(new Label("Camera pos", uiSkin));
         table.add(cameraPos = new Label("Hello", uiSkin));
 
@@ -190,10 +193,6 @@ public class GameScreen extends AbstractScreen {
         table.row();
         table.add(new Label("World", uiSkin));
         table.add(worldCoord = new Label("", uiSkin));
-
-        if (Main.DEBUG_UI) {
-            table.debugAll();
-        }
         return table;
     }
 }

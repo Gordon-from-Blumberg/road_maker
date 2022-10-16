@@ -24,6 +24,8 @@ public class GameUIRenderer extends UIRenderer {
 
     @Override
     public void render(float dt) {
+        toGameViewConverter.convert(Gdx.input.getX(), Gdx.input.getY(), GAME_VIEW_COORDS);
+
         super.render(dt);
     }
 }
