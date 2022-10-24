@@ -1,6 +1,7 @@
 package com.gordonfromblumberg.games.core.common.world;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -14,7 +15,6 @@ import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.animation.AnimatedParameterFloat;
 import com.gordonfromblumberg.games.core.common.animation.GbAnimation;
@@ -29,7 +29,6 @@ public class GameWorldRenderer extends FBORenderer {
 
     private final GameWorld world;
     private final Batch batch;
-    private Viewport viewport;
     private final Rectangle worldArea = new Rectangle();
     private IsometricTiledMapRenderer mapRenderer;
     private final ShapeRenderer shapeRenderer = new ShapeRenderer();
@@ -41,8 +40,8 @@ public class GameWorldRenderer extends FBORenderer {
     private final Color pauseColor = Color.GRAY;
     TextureRegion background;
 
-    public GameWorldRenderer(GameWorld world, Batch batch, Viewport viewport) {
-        super(viewport);
+    public GameWorldRenderer(GameWorld world, Batch batch) {
+        super();
         Gdx.app.log("INIT", "GameWorldRenderer constructor");
         this.batch = batch;
         this.world = world;
@@ -69,6 +68,8 @@ public class GameWorldRenderer extends FBORenderer {
 
     @Override
     public void render(float dt) {
+        updateCamera();
+
         batch.begin();
         final Color origColor = TEMP_COLOR.set(batch.getColor());
         if (world.paused) {
@@ -98,7 +99,7 @@ public class GameWorldRenderer extends FBORenderer {
             final Iterator<ClickPoint> it = clickPoints.iterator();
             while (it.hasNext()) {
                 ClickPoint cp = it.next();
-                worldToScreen(tempVec3.set(cp.x, cp.y, 1));
+                worldToView(tempVec3.set(cp.x, cp.y, 1));
                 cp.animation.update(dt);
                 final float circleMul = cp.getCircle();
                 Gdx.app.log("RENDER", "render click at " + cp.x + ", " + cp.y + ", mul = " + circleMul);
@@ -125,24 +126,35 @@ public class GameWorldRenderer extends FBORenderer {
     }
 
     /**
-     * Transforms viewport coordinates to isometric world
+     * Transforms viewport coordinates to logical world
      */
-    public void screenToWorld(Vector3 coords) {
-        coords.z = 1.0f;
-        coords.mul(viewToWorld);
+    public void viewToWorld(float x, float y, Vector3 out) {
+        out.set(x, y, 1f).mul(viewToWorld);
     }
 
     /**
-     * Transforms isometric world to viewport coordinates
+     * Transforms logical world to viewport coordinates
      */
-    public void worldToScreen(Vector3 coords) {
+    public void worldToView(Vector3 coords) {
         coords.z = 1.0f;
         coords.mul(worldToView);
     }
 
     void click(float x, float y) {
-        worldToScreen(tempVec3.set(x, y, 1));
+        worldToView(tempVec3.set(x, y, 1));
         ClickPoint cp = ClickPoint.getInstance();
         clickPoints.add(cp.init(tempVec3.x, tempVec3.y));
+    }
+
+    private void updateCamera() {
+        float cameraSpeed = 8 * camera.zoom;
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
+            camera.translate(-cameraSpeed, 0);
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
+            camera.translate(cameraSpeed, 0);
+//        if (Gdx.input.isKeyPressed(Input.Keys.UP))
+//            camera.translate(0, cameraSpeed);
+//        if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
+//            camera.translate(0, -cameraSpeed);
     }
 }
