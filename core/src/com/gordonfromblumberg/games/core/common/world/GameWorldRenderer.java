@@ -156,5 +156,7 @@ public class GameWorldRenderer extends FBORenderer {
 //            camera.translate(0, cameraSpeed);
 //        if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
 //            camera.translate(0, -cameraSpeed);
+
+        camera.update();
     }
 }
