@@ -1,12 +1,16 @@
 package com.gordonfromblumberg.games.core.common.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
+import com.gordonfromblumberg.games.core.common.ui.SaveLoadWindow;
 import com.gordonfromblumberg.games.core.common.ui.UIUtils;
 import com.gordonfromblumberg.games.core.common.ui.UpdatableLabel;
 import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
@@ -25,6 +29,7 @@ public class GameUIRenderer extends UIRenderer {
     private final CoordsConverter toGameWorld;
     private Label screenCoord, viewCoord, worldCoord;
     private final Consumer<WorldCameraParams> worldCameraParamsGetter;
+    private SaveLoadWindow saveLoadWindow;
 
     public GameUIRenderer(SpriteBatch batch, GameWorld world,
                           CoordsConverter toGameView, CoordsConverter toGameWorld,
@@ -59,6 +64,23 @@ public class GameUIRenderer extends UIRenderer {
         } else {
             rootTable.add();
         }
+
+        stage.addListener(new InputListener() {
+            @Override
+            public boolean keyDown(InputEvent event, int keycode) {
+                if (keycode == Input.Keys.F5) {
+                    if (saveLoadWindow == null) {
+                        saveLoadWindow = new SaveLoadWindow("Save / load", uiSkin);
+                        stage.addActor(saveLoadWindow);
+                        saveLoadWindow.setVisible(true);
+                    } else {
+                        saveLoadWindow.setVisible(!saveLoadWindow.isVisible());
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     private Table createCoordsDebugTable(Skin uiSkin) {
