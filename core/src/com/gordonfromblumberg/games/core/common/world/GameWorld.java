@@ -18,6 +18,9 @@ import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.event.Event;
 import com.gordonfromblumberg.games.core.common.event.EventHandler;
 import com.gordonfromblumberg.games.core.common.event.EventProcessor;
+import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
+import com.gordonfromblumberg.games.core.common.log.LogManager;
+import com.gordonfromblumberg.games.core.common.log.Logger;
 import com.gordonfromblumberg.games.core.common.utils.ClickHandler;
 import com.gordonfromblumberg.games.core.common.model.GameObject;
 import com.gordonfromblumberg.games.core.common.utils.BSPTree;
@@ -26,6 +29,7 @@ import com.gordonfromblumberg.games.core.common.utils.RandomUtils;
 import java.util.Iterator;
 
 public class GameWorld implements Disposable {
+    private static final Logger log = LogManager.create(GameWorld.class);
     private static int nextId = 1;
 
     private final Array<GameObject> gameObjects = new Array<>();
@@ -59,6 +63,7 @@ public class GameWorld implements Disposable {
         pauseText = new BitmapFontCache(assets.get("ui/uiskin.json", Skin.class).getFont("default-font"));
         pauseText.setText("PAUSE", 100, 100);
     }
+
     public void initialize() {
         Gdx.app.log("INIT", "GameWorld init");
         final AssetManager assets = Main.getInstance().assets();
@@ -79,8 +84,7 @@ public class GameWorld implements Disposable {
             }
         }
         map.getLayers().add(layer);
-
-
+        log.debug("Game world initialized");
     }
 
     public void setSize(float width, float height) {
