@@ -1,5 +1,6 @@
 package com.gordonfromblumberg.games.core.common.screens;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -7,8 +8,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.gordonfromblumberg.games.core.common.Main;
+import com.gordonfromblumberg.games.core.common.log.LogManager;
+import com.gordonfromblumberg.games.core.common.log.Logger;
 
 public class MainMenuScreen extends AbstractScreen {
+    private static final Logger log = LogManager.create(MainMenuScreen.class);
 
     TextButton textButton;
 
@@ -16,6 +20,9 @@ public class MainMenuScreen extends AbstractScreen {
         super(batch);
 
         color = Color.FOREST;
+
+        log.debug("Local storage path = " + Gdx.files.getLocalStoragePath());
+        log.debug("External storage path = " + Gdx.files.getExternalStoragePath());
     }
 
     @Override

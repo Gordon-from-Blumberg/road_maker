@@ -10,6 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
+import com.gordonfromblumberg.games.core.common.log.LogManager;
+import com.gordonfromblumberg.games.core.common.log.Logger;
 import com.gordonfromblumberg.games.core.common.ui.SaveLoadWindow;
 import com.gordonfromblumberg.games.core.common.ui.UIUtils;
 import com.gordonfromblumberg.games.core.common.ui.UpdatableLabel;
@@ -20,6 +22,8 @@ import com.gordonfromblumberg.games.core.common.world.GameWorld;
 import java.util.function.Consumer;
 
 public class GameUIRenderer extends UIRenderer {
+    private static final Logger log = LogManager.create(GameUIRenderer.class);
+
     private GameWorld world;
 
     private final Vector3 GAME_VIEW_COORDS = new Vector3();
@@ -36,7 +40,7 @@ public class GameUIRenderer extends UIRenderer {
                           Consumer<WorldCameraParams> worldCameraParamsGetter) {
         super(batch);
 
-        Gdx.app.log("INIT", "GameUIRenderer constructor");
+        log.info("GameUIRenderer constructor");
 
         this.world = world;
         this.toGameView = toGameView;

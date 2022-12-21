@@ -16,12 +16,16 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.gordonfromblumberg.games.core.common.Main;
+import com.gordonfromblumberg.games.core.common.log.LogManager;
+import com.gordonfromblumberg.games.core.common.log.Logger;
 import com.gordonfromblumberg.games.core.common.screens.FBORenderer;
 import com.gordonfromblumberg.games.core.common.model.GameObject;
 
 import java.util.Iterator;
 
 public class GameWorldRenderer extends FBORenderer {
+    private static final Logger log = LogManager.create(GameWorldRenderer.class);
+
     private static final Color TEMP_COLOR = new Color();
     private static final Vector3 tempVec3 = new Vector3();
 
@@ -40,13 +44,13 @@ public class GameWorldRenderer extends FBORenderer {
 
     public GameWorldRenderer(GameWorld world, Batch batch) {
         super();
-        Gdx.app.log("INIT", "GameWorldRenderer constructor");
+        log.info("GameWorldRenderer constructor");
         this.batch = batch;
         this.world = world;
     }
 
     public void initialize() {
-        Gdx.app.log("INIT", "GameWorldRenderer init");
+        log.info("GameWorldRenderer init");
         final AssetManager assets = Main.getInstance().assets();
 
         background = assets
@@ -100,7 +104,7 @@ public class GameWorldRenderer extends FBORenderer {
                 worldToView(tempVec3.set(cp.x, cp.y, 1));
                 cp.animation.update(dt);
                 final float circleMul = cp.getCircle();
-                Gdx.app.log("RENDER", "render click at " + cp.x + ", " + cp.y + ", mul = " + circleMul);
+                log.debug("Render click at " + cp.x + ", " + cp.y + ", mul = " + circleMul);
                 final float clickWidth = circleMul * ClickPoint.WIDTH;
                 final float clickHeight = circleMul * ClickPoint.HEIGHT;
                 shapeRenderer.ellipse(cp.x - clickWidth / 2, cp.y - clickHeight / 2, clickWidth, clickHeight);

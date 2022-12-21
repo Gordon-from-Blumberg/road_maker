@@ -54,7 +54,7 @@ public class GameWorld implements Disposable {
     final Array<ClickHandler> clickHandlers = new Array<>(1);
 
     public GameWorld() {
-        Gdx.app.log("INIT", "GameWorld constructor");
+        log.info("GameWorld constructor");
         final AssetManager assets = Main.getInstance().assets();
 
         visibleArea = new Rectangle();
@@ -65,7 +65,7 @@ public class GameWorld implements Disposable {
     }
 
     public void initialize() {
-        Gdx.app.log("INIT", "GameWorld init");
+        log.info("GameWorld init");
         final AssetManager assets = Main.getInstance().assets();
         final RandomUtils.RandomGen rand = RandomUtils.randomGen(100389 + 90492);
         map = new TiledMap();
