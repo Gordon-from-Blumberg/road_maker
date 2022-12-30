@@ -38,7 +38,7 @@ public class DesktopLauncher {
 						continue;
 					}
 				}
-				Main.WORK_DIR = workDir;
+				Main.WORK_DIR_PATH = workDir;
 				continue;
 			}
 		}

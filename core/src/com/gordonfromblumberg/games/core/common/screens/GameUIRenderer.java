@@ -12,9 +12,7 @@ import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
 import com.gordonfromblumberg.games.core.common.log.LogManager;
 import com.gordonfromblumberg.games.core.common.log.Logger;
-import com.gordonfromblumberg.games.core.common.ui.SaveLoadWindow;
-import com.gordonfromblumberg.games.core.common.ui.UIUtils;
-import com.gordonfromblumberg.games.core.common.ui.UpdatableLabel;
+import com.gordonfromblumberg.games.core.common.ui.*;
 import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
 import com.gordonfromblumberg.games.core.common.utils.CoordsConverter;
 import com.gordonfromblumberg.games.core.common.world.GameWorld;
@@ -22,6 +20,8 @@ import com.gordonfromblumberg.games.core.common.world.GameWorld;
 import java.util.function.Consumer;
 
 public class GameUIRenderer extends UIRenderer {
+    private static final String DEFAULT_SAVE_DIR = "saves";
+    private static final String SAVE_EXTENSION = "dat";
     private static final Logger log = LogManager.create(GameUIRenderer.class);
 
     private GameWorld world;
@@ -33,7 +33,7 @@ public class GameUIRenderer extends UIRenderer {
     private final CoordsConverter toGameWorld;
     private Label screenCoord, viewCoord, worldCoord;
     private final Consumer<WorldCameraParams> worldCameraParamsGetter;
-    private SaveLoadWindow saveLoadWindow;
+    private SaveLoadWindow saveWindow, loadWindow;
 
     public GameUIRenderer(SpriteBatch batch, GameWorld world,
                           CoordsConverter toGameView, CoordsConverter toGameWorld,
@@ -69,16 +69,31 @@ public class GameUIRenderer extends UIRenderer {
             rootTable.add();
         }
 
+        String savesPath = configManager.getString("saves.dir", DEFAULT_SAVE_DIR);
         stage.addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
-                if (keycode == Input.Keys.F5) {
-                    if (saveLoadWindow == null) {
-                        saveLoadWindow = new SaveLoadWindow("Save / load", uiSkin);
-                        stage.addActor(saveLoadWindow);
-                        saveLoadWindow.setVisible(true);
+                if (keycode == Input.Keys.F5 && (loadWindow == null || !loadWindow.isVisible())) {
+                    if (saveWindow == null) {
+                        saveWindow = new SaveLoadWindow("Save", uiSkin, savesPath, SAVE_EXTENSION);
+                        stage.addActor(saveWindow);
+                        saveWindow.setWidth(300f);
+                        saveWindow.setHeight(300f);
+                        saveWindow.toScreenCenter();
+                        saveWindow.open();
                     } else {
-                        saveLoadWindow.setVisible(!saveLoadWindow.isVisible());
+                        saveWindow.toggle();
+                    }
+                    return true;
+                } else if (keycode == Input.Keys.F6 && (saveWindow == null || !saveWindow.isVisible())) {
+                    if (loadWindow == null) {
+                        loadWindow = new SaveLoadWindow("Load", uiSkin, savesPath, SAVE_EXTENSION);
+                        loadWindow.setLoad();
+                        stage.addActor(loadWindow);
+                        loadWindow.toScreenCenter();
+                        loadWindow.open();
+                    } else {
+                        loadWindow.toggle();
                     }
                     return true;
                 }
