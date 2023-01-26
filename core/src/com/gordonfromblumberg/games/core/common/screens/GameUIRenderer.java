@@ -69,17 +69,12 @@ public class GameUIRenderer extends UIRenderer {
             rootTable.add();
         }
 
-        String savesPath = configManager.getString("saves.dir", DEFAULT_SAVE_DIR);
         stage.addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
                 if (keycode == Input.Keys.F5 && (loadWindow == null || !loadWindow.isVisible())) {
                     if (saveWindow == null) {
-                        saveWindow = new SaveLoadWindow("Save", uiSkin, savesPath, SAVE_EXTENSION);
-                        stage.addActor(saveWindow);
-                        saveWindow.setWidth(300f);
-                        saveWindow.setHeight(300f);
-                        saveWindow.toScreenCenter();
+                        saveWindow = createSaveLoadWindow(false, uiSkin);
                         saveWindow.open();
                     } else {
                         saveWindow.toggle();
@@ -87,10 +82,7 @@ public class GameUIRenderer extends UIRenderer {
                     return true;
                 } else if (keycode == Input.Keys.F6 && (saveWindow == null || !saveWindow.isVisible())) {
                     if (loadWindow == null) {
-                        loadWindow = new SaveLoadWindow("Load", uiSkin, savesPath, SAVE_EXTENSION);
-                        loadWindow.setLoad();
-                        stage.addActor(loadWindow);
-                        loadWindow.toScreenCenter();
+                        loadWindow = createSaveLoadWindow(true, uiSkin);
                         loadWindow.open();
                     } else {
                         loadWindow.toggle();
@@ -123,6 +115,26 @@ public class GameUIRenderer extends UIRenderer {
         table.add(new Label("World", uiSkin));
         table.add(worldCoord = new Label("", uiSkin));
         return table;
+    }
+
+    private SaveLoadWindow createSaveLoadWindow(boolean load, Skin skin) {
+        ConfigManager config = AbstractFactory.getInstance().configManager();
+        SaveLoadWindow window = new SaveLoadWindow(
+                load ? "Load" : "Save",
+                skin,
+                config.getString("saves.dir", DEFAULT_SAVE_DIR),
+                SAVE_EXTENSION
+        );
+        if (load) {
+            window.setLoad();
+        }
+
+        stage.addActor(window);
+        window.setWidth(config.getFloat("ui.saveload.width"));
+        window.setHeight(config.getFloat("ui.saveload.height"));
+        window.toScreenCenter();
+
+        return window;
     }
 
     @Override
