@@ -17,6 +17,7 @@ import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
 import com.gordonfromblumberg.games.core.common.utils.JsonConfigLoader;
 import com.gordonfromblumberg.games.core.common.utils.StringUtils;
 
+import java.io.File;
 import java.util.function.Consumer;
 
 public class Main extends Game {
