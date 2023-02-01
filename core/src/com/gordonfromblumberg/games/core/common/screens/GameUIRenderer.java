@@ -4,14 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.utils.SnapshotArray;
 import com.gordonfromblumberg.games.core.common.Main;
-import com.gordonfromblumberg.games.core.common.event.Event;
-import com.gordonfromblumberg.games.core.common.event.EventHandler;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
-import com.gordonfromblumberg.games.core.common.ui.IntChangeableLabel;
 import com.gordonfromblumberg.games.core.common.ui.UIUtils;
 import com.gordonfromblumberg.games.core.common.ui.UpdatableLabel;
 import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
@@ -19,8 +14,6 @@ import com.gordonfromblumberg.games.core.common.utils.CoordsConverter;
 import com.gordonfromblumberg.games.core.common.world.GameWorld;
 
 import java.util.function.Consumer;
-
-import static com.gordonfromblumberg.games.core.common.utils.StringUtils.padLeft;
 
 public class GameUIRenderer extends UIRenderer {
     private GameWorld world;
@@ -62,7 +55,7 @@ public class GameUIRenderer extends UIRenderer {
 
         if (Main.DEBUG) {
             rootTable.add(createCoordsDebugTable(uiSkin))
-                    .left().top();
+                    .left().top().expand();
         } else {
             rootTable.add();
         }

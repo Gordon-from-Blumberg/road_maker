@@ -16,8 +16,6 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.gordonfromblumberg.games.core.common.Main;
-import com.gordonfromblumberg.games.core.common.animation.AnimatedParameterFloat;
-import com.gordonfromblumberg.games.core.common.animation.GbAnimation;
 import com.gordonfromblumberg.games.core.common.screens.FBORenderer;
 import com.gordonfromblumberg.games.core.common.model.GameObject;
 
@@ -140,7 +138,7 @@ public class GameWorldRenderer extends FBORenderer {
         coords.mul(worldToView);
     }
 
-    void click(float x, float y) {
+    public void click(float x, float y) {
         worldToView(tempVec3.set(x, y, 1));
         ClickPoint cp = ClickPoint.getInstance();
         clickPoints.add(cp.init(tempVec3.x, tempVec3.y));
@@ -152,10 +150,10 @@ public class GameWorldRenderer extends FBORenderer {
             camera.translate(-cameraSpeed, 0);
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
             camera.translate(cameraSpeed, 0);
-//        if (Gdx.input.isKeyPressed(Input.Keys.UP))
-//            camera.translate(0, cameraSpeed);
-//        if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
-//            camera.translate(0, -cameraSpeed);
+        if (Gdx.input.isKeyPressed(Input.Keys.UP))
+            camera.translate(0, cameraSpeed);
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
+            camera.translate(0, -cameraSpeed);
 
         camera.update();
     }

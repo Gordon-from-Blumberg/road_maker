@@ -8,9 +8,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
-import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
 import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
 import com.gordonfromblumberg.games.core.common.world.GameWorld;
@@ -45,6 +42,7 @@ public class GameScreen extends AbstractScreen {
                 ((GameUIRenderer) uiRenderer).click(Input.Buttons.LEFT, x, y);
                 renderer.screenToViewport(x, y, viewCoords3);
                 renderer.viewToWorld(viewCoords3.x, viewCoords3.y, worldCoords3);
+                renderer.click(worldCoords3.x, worldCoords3.y);
                 gameWorld.click(Input.Buttons.LEFT, worldCoords3.x, worldCoords3.y);
             }
         });
