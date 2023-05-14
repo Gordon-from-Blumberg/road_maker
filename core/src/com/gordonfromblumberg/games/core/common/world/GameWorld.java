@@ -24,7 +24,7 @@ import com.gordonfromblumberg.games.core.common.log.Logger;
 import com.gordonfromblumberg.games.core.common.utils.ClickHandler;
 import com.gordonfromblumberg.games.core.common.model.GameObject;
 import com.gordonfromblumberg.games.core.common.utils.BSPTree;
-import com.gordonfromblumberg.games.core.common.utils.RandomUtils;
+import com.gordonfromblumberg.games.core.common.utils.RandomGen;
 
 import java.util.Iterator;
 
@@ -67,7 +67,8 @@ public class GameWorld implements Disposable {
     public void initialize() {
         log.info("GameWorld init");
         final AssetManager assets = Main.getInstance().assets();
-        final RandomUtils.RandomGen rand = RandomUtils.randomGen(100389 + 90492);
+        RandomGen.setSeed(100389 + 90492);
+        RandomGen rand = RandomGen.INSTANCE;
         map = new TiledMap();
         int width = 20;
         int height = 40;
@@ -76,7 +77,7 @@ public class GameWorld implements Disposable {
         for (int i = 0; i < width; ++i) {
             for (int j = 0; j < height; ++j) {
                 TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
-                int randTile = rand.nextInt(1, 4);
+                int randTile = rand.nextInt(1, 3);
                 cell.setTile(new StaticTiledMapTile(assets
                         .get("image/texture_pack.atlas", TextureAtlas.class)
                         .findRegion("tile2" + randTile)));

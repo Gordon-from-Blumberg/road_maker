@@ -18,12 +18,12 @@ import com.badlogic.gdx.utils.Array;
 import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.log.LogManager;
 import com.gordonfromblumberg.games.core.common.log.Logger;
-import com.gordonfromblumberg.games.core.common.screens.FBORenderer;
+import com.gordonfromblumberg.games.core.common.screens.AbstractRenderer;
 import com.gordonfromblumberg.games.core.common.model.GameObject;
 
 import java.util.Iterator;
 
-public class GameWorldRenderer extends FBORenderer {
+public class GameWorldRenderer extends AbstractRenderer {
     private static final Logger log = LogManager.create(GameWorldRenderer.class);
 
     private static final Color TEMP_COLOR = new Color();
