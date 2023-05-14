@@ -37,6 +37,21 @@ public class StringUtilsTest {
     }
 
     @Test
+    void floatToStringTest() {
+        Assertions.assertEquals("1.2", floatToString(1.2f, 1));
+        Assertions.assertEquals("1.20", floatToString(1.2f, 2));
+        Assertions.assertEquals("1", floatToString(1.2f, 0));
+        Assertions.assertEquals("-1.2", floatToString(-1.2f, 1));
+        Assertions.assertEquals("-1.20", floatToString(-1.2f, 2));
+        Assertions.assertEquals("-1", floatToString(-1.2f, 0));
+        Assertions.assertEquals("1.000", floatToString(1, 3));
+        Assertions.assertEquals("0.001", floatToString(0.001f, 3));
+        Assertions.assertEquals("0.00", floatToString(0.001f, 2));
+        Assertions.assertEquals("0.0", floatToString(0.001f, 1));
+        Assertions.assertEquals("0.002", floatToString(0.0016f, 3));
+    }
+
+    @Test
     void isBlankTest() {
         Assertions.assertTrue(isBlank(null));
         Assertions.assertTrue(isBlank(""));
