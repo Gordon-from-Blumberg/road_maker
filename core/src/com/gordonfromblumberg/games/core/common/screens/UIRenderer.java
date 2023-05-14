@@ -15,7 +15,7 @@ import com.gordonfromblumberg.games.core.common.ui.UIUtils;
 import com.gordonfromblumberg.games.core.common.ui.UIViewport;
 import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
 
-public class UIRenderer extends SpriteBatchRenderer {
+public class UIRenderer extends AbstractRenderer {
     private static final Logger log = LogManager.create(UIRenderer.class);
 
     protected Stage stage;
@@ -25,12 +25,12 @@ public class UIRenderer extends SpriteBatchRenderer {
     protected float minHeight;
 
     public UIRenderer(SpriteBatch batch) {
-        super(batch);
+        super();
 
         log.info("UIRenderer constructor for class " + getClass().getSimpleName());
 
         this.centerCamera = true;
-        this.stage = createStage();
+        this.stage = new Stage(viewport, batch);
         if (Main.DEBUG_UI) {
             stage.setDebugAll(true);
         }
@@ -55,10 +55,6 @@ public class UIRenderer extends SpriteBatchRenderer {
         minWidth = configManager.getFloat("minUiWidth");
         minHeight = configManager.getFloat("minUiHeight");
         return new UIViewport(minWidth, minHeight, camera);
-    }
-
-    protected Stage createStage() {
-        return new Stage(viewport, batch);
     }
 
     public void addListener(InputListener listener) {

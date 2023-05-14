@@ -10,10 +10,13 @@ import com.gordonfromblumberg.games.core.common.log.Logger;
 
 @SuppressWarnings("unchecked")
 public class EventProcessor {
+    public static final EventProcessor INSTANCE = new EventProcessor();
     private static final Logger log = LogManager.create(EventProcessor.class);
 
     private final ObjectMap<String, Array<EventHandler>> handlers = new IdentityMap<>(16);
     private final Queue<Event> eventQueue = new Queue<>();
+
+    private EventProcessor() {}
 
     public void registerHandler(String type, EventHandler handler) {
         Array<EventHandler> handlerList;

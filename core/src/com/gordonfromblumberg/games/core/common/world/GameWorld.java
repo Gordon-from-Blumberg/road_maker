@@ -2,28 +2,23 @@ package com.gordonfromblumberg.games.core.common.world;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.BitmapFontCache;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
-
 import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.event.Event;
 import com.gordonfromblumberg.games.core.common.event.EventHandler;
 import com.gordonfromblumberg.games.core.common.event.EventProcessor;
-import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
 import com.gordonfromblumberg.games.core.common.log.LogManager;
 import com.gordonfromblumberg.games.core.common.log.Logger;
-import com.gordonfromblumberg.games.core.common.utils.ClickHandler;
 import com.gordonfromblumberg.games.core.common.model.GameObject;
 import com.gordonfromblumberg.games.core.common.utils.BSPTree;
+import com.gordonfromblumberg.games.core.common.utils.ClickHandler;
 import com.gordonfromblumberg.games.core.common.utils.RandomGen;
 
 import java.util.Iterator;
@@ -35,16 +30,15 @@ public class GameWorld implements Disposable {
     private final Array<GameObject> gameObjects = new Array<>();
 
     private final BSPTree tree;
-    private final EventProcessor eventProcessor = new EventProcessor();
+    protected final EventProcessor eventProcessor = EventProcessor.INSTANCE;
 
     public Rectangle visibleArea;
     private float width, height;
+    float mouseX, mouseY; // current world coordinates of mouse
 
     TiledMap map;
 
     boolean paused;
-    private final Color pauseColor = Color.GRAY;
-    final BitmapFontCache pauseText;
 
     private int maxCount = 0;
 
@@ -55,13 +49,9 @@ public class GameWorld implements Disposable {
 
     public GameWorld() {
         log.info("GameWorld constructor");
-        final AssetManager assets = Main.getInstance().assets();
 
         visibleArea = new Rectangle();
         tree = new BSPTree(0, 0, 0, 0);
-
-        pauseText = new BitmapFontCache(assets.get("ui/uiskin.json", Skin.class).getFont("default-font"));
-        pauseText.setText("PAUSE", 100, 100);
     }
 
     public void initialize() {
@@ -72,7 +62,7 @@ public class GameWorld implements Disposable {
         map = new TiledMap();
         int width = 20;
         int height = 40;
-        TiledMapTileLayer layer = new TiledMapTileLayer(width, height, 48, 32);
+        TiledMapTileLayer layer = new TiledMapTileLayer(width, height, 100, 50);
         layer.setName("map");
         for (int i = 0; i < width; ++i) {
             for (int j = 0; j < height; ++j) {
@@ -80,7 +70,7 @@ public class GameWorld implements Disposable {
                 int randTile = rand.nextInt(1, 3);
                 cell.setTile(new StaticTiledMapTile(assets
                         .get("image/texture_pack.atlas", TextureAtlas.class)
-                        .findRegion("tile2" + randTile)));
+                        .findRegion("tile0" + randTile)));
                 layer.setCell(i, j, cell);
             }
         }
@@ -96,7 +86,6 @@ public class GameWorld implements Disposable {
 
     public void addGameObject(GameObject gameObject) {
         gameObjects.add(gameObject);
-        gameObject.setGameWorld(this);
         gameObject.setActive(true);
         gameObject.setId(nextId++);
         if (gameObjects.size > maxCount) maxCount = gameObjects.size;
@@ -111,7 +100,15 @@ public class GameWorld implements Disposable {
         return gameObjects;
     }
 
-    public void update(float delta) {
+    /**
+     * @param delta Time after last frame in seconds
+     * @param mouseX World mouse x coordinate
+     * @param mouseY World mouse y coordinate
+     */
+    public void update(float delta, float mouseX, float mouseY) {
+        this.mouseX = mouseX;
+        this.mouseY = mouseY;
+
         if (!paused) {
             time += delta;
 //          visibleArea.set(0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
@@ -133,6 +130,10 @@ public class GameWorld implements Disposable {
                 Gdx.app.log("GameWorld", gameObjects.size + " objects in the world of maximum " + maxCount);
             }
         }
+    }
+
+    public TiledMap getMap() {
+        return map;
     }
 
     // world coords
@@ -163,6 +164,10 @@ public class GameWorld implements Disposable {
 
     public void pause() {
         this.paused = !this.paused;
+    }
+
+    public boolean isPaused() {
+        return paused;
     }
 
     public void registerHandler(String type, EventHandler handler) {

@@ -9,11 +9,9 @@ import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.Pool;
 
 import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.utils.Poolable;
-import com.gordonfromblumberg.games.core.common.world.GameWorld;
 
 @SuppressWarnings("rawtypes")
 public class GameObject implements Disposable, Poolable {
@@ -27,8 +25,6 @@ public class GameObject implements Disposable, Poolable {
     protected static final int Y4 = 7;
 
     protected int id;
-
-    public GameWorld gameWorld;
 
     protected final Sprite sprite = new Sprite();
     public final Polygon polygon = createPolygon();
@@ -58,10 +54,6 @@ public class GameObject implements Disposable, Poolable {
         sprite.setBounds(polygon.getX() - width / 2, polygon.getY() - height / 2, width, height);
         sprite.setOriginCenter();
         sprite.draw(batch);
-    }
-
-    public void setGameWorld(GameWorld gameWorld) {
-        this.gameWorld = gameWorld;
     }
 
     protected Polygon createPolygon() {
@@ -184,7 +176,6 @@ public class GameObject implements Disposable, Poolable {
     public void reset() {
         id = -1;
         active = false;
-        gameWorld = null;
         setPosition(0, 0);
         polygon.setRotation(0);
     }

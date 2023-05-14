@@ -1,6 +1,5 @@
-package com.gordonfromblumberg.games.core.common.world;
+package com.gordonfromblumberg.games.core.common.ui;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Pool;
 import com.gordonfromblumberg.games.core.common.animation.AnimatedParameterFloat;
 import com.gordonfromblumberg.games.core.common.animation.GbAnimation;
@@ -15,8 +14,8 @@ public class ClickPoint implements Poolable {
         }
     };
     static final float DURATION = 0.25f;
-    static final float WIDTH = 10f;
-    static final float HEIGHT = WIDTH / 1.5f;
+    public static final float WIDTH = 10f;
+    public static final float HEIGHT = WIDTH / 1.5f;
     private static final int CLICK_CIRCLE = 0;
     private static final AnimatedParameterFloat clickCircle = AnimatedParameterFloat.getInstance();
 
@@ -27,7 +26,7 @@ public class ClickPoint implements Poolable {
     }
 
     GbAnimation animation;
-    float x, y; // view coords
+    private float x, y; // view coords
 
     private ClickPoint() {}
 
@@ -47,6 +46,18 @@ public class ClickPoint implements Poolable {
 
     public float getCircle() {
         return animation.getFloat(CLICK_CIRCLE);
+    }
+
+    public GbAnimation getAnimation() {
+        return animation;
+    }
+
+    public float getX() {
+        return x;
+    }
+
+    public float getY() {
+        return y;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.gordonfromblumberg.games.core.common.screens;
+package com.gordonfromblumberg.games.core.common.world;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -12,10 +12,10 @@ import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
 import com.gordonfromblumberg.games.core.common.log.LogManager;
 import com.gordonfromblumberg.games.core.common.log.Logger;
+import com.gordonfromblumberg.games.core.common.screens.UIRenderer;
 import com.gordonfromblumberg.games.core.common.ui.*;
 import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
 import com.gordonfromblumberg.games.core.common.utils.CoordsConverter;
-import com.gordonfromblumberg.games.core.common.world.GameWorld;
 
 import java.util.function.Consumer;
 

@@ -6,20 +6,22 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.BitmapFontCache;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
-import com.badlogic.gdx.math.Matrix3;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
+import com.gordonfromblumberg.games.core.common.screens.AbstractRenderer;
 import com.gordonfromblumberg.games.core.common.Main;
+import com.gordonfromblumberg.games.core.common.animation.GbAnimation;
 import com.gordonfromblumberg.games.core.common.log.LogManager;
 import com.gordonfromblumberg.games.core.common.log.Logger;
-import com.gordonfromblumberg.games.core.common.screens.AbstractRenderer;
 import com.gordonfromblumberg.games.core.common.model.GameObject;
+import com.gordonfromblumberg.games.core.common.ui.ClickPoint;
 
 import java.util.Iterator;
 
@@ -39,14 +41,20 @@ public class GameWorldRenderer extends AbstractRenderer {
 
     final Array<ClickPoint> clickPoints = new Array<>();
 
-    private final Color pauseColor = Color.GRAY;
     TextureRegion background;
+    private final Color pauseColor = Color.GRAY;
+    final BitmapFontCache pauseText;
 
     public GameWorldRenderer(GameWorld world, Batch batch) {
         super();
         log.info("GameWorldRenderer constructor");
         this.batch = batch;
         this.world = world;
+
+        pauseText = new BitmapFontCache(Main.getInstance().assets()
+                .get("ui/uiskin.json", Skin.class)
+                .getFont("default-font"));
+        pauseText.setText("PAUSE", 100, 100);
     }
 
     public void initialize() {
@@ -57,8 +65,8 @@ public class GameWorldRenderer extends AbstractRenderer {
                 .get("image/texture_pack.atlas", TextureAtlas.class)
                 .findRegion("background");
 
-        this.mapRenderer = new IsometricTiledMapRenderer(world.map, batch);
-        TiledMapTileLayer l = (TiledMapTileLayer) world.map.getLayers().get("map");
+        this.mapRenderer = new IsometricTiledMapRenderer(world.getMap(), batch);
+        TiledMapTileLayer l = (TiledMapTileLayer) world.getMap().getLayers().get("map");
         viewport.getCamera().position.set(l.getWidth() * l.getTileWidth() / 2f, 0, 0);
         viewToWorld.set(new float[] {
                  1.0f / l.getTileWidth(),  1.0f / l.getTileWidth(),  0.0f,
@@ -74,16 +82,16 @@ public class GameWorldRenderer extends AbstractRenderer {
 
         batch.begin();
         final Color origColor = TEMP_COLOR.set(batch.getColor());
-        if (world.paused) {
+        if (world.isPaused()) {
             batch.setColor(pauseColor);
         }
 
 //        batch.draw(background, 0, 0);
 
         mapRenderer.setView((OrthographicCamera) viewport.getCamera());
-        mapRenderer.renderTileLayer((TiledMapTileLayer) world.map.getLayers().get(0));
+        mapRenderer.renderTileLayer((TiledMapTileLayer) world.getMap().getLayers().get(0));
 
-        if (world.paused) {
+        if (world.isPaused()) {
             for (GameObject gameObject : world.getGameObjects()) {
                 gameObject.getSprite().setColor(pauseColor);
                 gameObject.render(batch);
@@ -101,15 +109,18 @@ public class GameWorldRenderer extends AbstractRenderer {
             final Iterator<ClickPoint> it = clickPoints.iterator();
             while (it.hasNext()) {
                 ClickPoint cp = it.next();
-                worldToView(tempVec3.set(cp.x, cp.y, 1));
-                cp.animation.update(dt);
+                float x = cp.getX();
+                float y = cp.getY();
+                worldToView(tempVec3.set(x, y, 1));
+                GbAnimation animation = cp.getAnimation();
+                animation.update(dt);
                 final float circleMul = cp.getCircle();
-                log.debug("Render click at " + cp.x + ", " + cp.y + ", mul = " + circleMul);
+                log.debug("Render click at " + x + ", " + y + ", mul = " + circleMul);
                 final float clickWidth = circleMul * ClickPoint.WIDTH;
                 final float clickHeight = circleMul * ClickPoint.HEIGHT;
-                shapeRenderer.ellipse(cp.x - clickWidth / 2, cp.y - clickHeight / 2, clickWidth, clickHeight);
+                shapeRenderer.ellipse(x - clickWidth / 2, y - clickHeight / 2, clickWidth, clickHeight);
 
-                if (cp.animation.isFinished()) {
+                if (animation.isFinished()) {
                     it.remove();
                     cp.release();
                 }
@@ -119,8 +130,8 @@ public class GameWorldRenderer extends AbstractRenderer {
             batch.begin();
         }
 
-        if (world.paused) {
-            world.pauseText.draw(batch);
+        if (world.isPaused()) {
+            pauseText.draw(batch);
             batch.setColor(origColor);
         }
 

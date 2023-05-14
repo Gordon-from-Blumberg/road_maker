@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="DesktopLauncher" type="Application" factoryName="Application" nameIsGenerated="true">
     <option name="MAIN_CLASS_NAME" value="com.gordonfromblumberg.games.desktop.common.DesktopLauncher" />
-    <module name="evo_tree.desktop.main" />
+    <module name="mnb_like.desktop.main" />
     <option name="PROGRAM_PARAMETERS" value="-debug" />
     <method v="2">
       <option name="Make" enabled="true" />

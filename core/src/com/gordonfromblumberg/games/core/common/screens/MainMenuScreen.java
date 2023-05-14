@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.log.LogManager;
 import com.gordonfromblumberg.games.core.common.log.Logger;
+import com.gordonfromblumberg.games.core.common.world.GameScreen;
 
 public class MainMenuScreen extends AbstractScreen {
     private static final Logger log = LogManager.create(MainMenuScreen.class);

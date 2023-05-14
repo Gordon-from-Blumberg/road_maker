@@ -1,4 +1,4 @@
-package com.gordonfromblumberg.games.core.common.screens;
+package com.gordonfromblumberg.games.core.common.world;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -11,9 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
 import com.gordonfromblumberg.games.core.common.log.LogManager;
 import com.gordonfromblumberg.games.core.common.log.Logger;
+import com.gordonfromblumberg.games.core.common.screens.AbstractScreen;
 import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
-import com.gordonfromblumberg.games.core.common.world.GameWorld;
-import com.gordonfromblumberg.games.core.common.world.GameWorldRenderer;
 
 public class GameScreen extends AbstractScreen {
     private static final Logger log = LogManager.create(GameScreen.class);
@@ -24,7 +23,7 @@ public class GameScreen extends AbstractScreen {
     private final Vector3 viewCoords3 = new Vector3();
     private final Vector3 worldCoords3 = new Vector3();
 
-    protected GameScreen(SpriteBatch batch) {
+    public GameScreen(SpriteBatch batch) {
         super(batch);
         log.info("GameScreen constructor");
         gameWorld = new GameWorld();
@@ -72,7 +71,11 @@ public class GameScreen extends AbstractScreen {
     @Override
     protected void update(float delta) {
         super.update(delta);
-        gameWorld.update(delta);        // update game state
+        int x = Gdx.input.getX();
+        int y = Gdx.input.getY();
+        renderer.screenToViewport(x, y, viewCoords3);
+        renderer.viewToWorld(viewCoords3.x, viewCoords3.y, worldCoords3);
+        gameWorld.update(delta, worldCoords3.x, worldCoords3.y);        // update game state
     }
 
     @Override
