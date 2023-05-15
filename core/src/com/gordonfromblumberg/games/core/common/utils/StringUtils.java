@@ -47,7 +47,6 @@ public class StringUtils {
         }
     }
 
-    // todo incorrect result for numbers ~0, especially negative
     /**
      * Round float number and convert it to string with specified digits after dot
      * @param value Flaot number
@@ -65,15 +64,21 @@ public class StringUtils {
                     case 3: return "0.000";
                 }
             }
+            int expectedDigits = decimals + 1;
+            boolean isNegative = rounded < 0;
+            if (isNegative)
+                rounded = -rounded;
             sb.append(rounded);
-            if (sb.length() < decimals) {
-                int n = decimals - sb.length() + 1;
+            if (sb.length() < expectedDigits) {
+                int n = expectedDigits - sb.length();
                 while (n-- > 0) {
                     sb.insert(0, '0');
                 }
             }
-            if (decimals > 0 && sb.length() > decimals)
+            if (decimals > 0)
                 sb.insert(sb.length() - decimals, '.');
+            if (isNegative)
+                sb.insert(0, '-');
             return sb.toString();
         } finally {
             sb.delete(0, sb.length());
