@@ -1,4 +1,4 @@
-package com.gordonfromblumberg.games.core.common.world;
+package com.gordonfromblumberg.games.core.game_template;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -9,32 +9,29 @@ import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Disposable;
 import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.event.Event;
 import com.gordonfromblumberg.games.core.common.event.EventHandler;
-import com.gordonfromblumberg.games.core.common.event.EventProcessor;
 import com.gordonfromblumberg.games.core.common.log.LogManager;
 import com.gordonfromblumberg.games.core.common.log.Logger;
 import com.gordonfromblumberg.games.core.common.model.GameObject;
 import com.gordonfromblumberg.games.core.common.utils.BSPTree;
 import com.gordonfromblumberg.games.core.common.utils.ClickHandler;
 import com.gordonfromblumberg.games.core.common.utils.RandomGen;
+import com.gordonfromblumberg.games.core.common.world.World;
 
 import java.util.Iterator;
 
-public class GameWorld implements Disposable {
-    private static final Logger log = LogManager.create(GameWorld.class);
+public class TemplateWorld extends World {
+    private static final Logger log = LogManager.create(TemplateWorld.class);
     private static int nextId = 1;
 
     private final Array<GameObject> gameObjects = new Array<>();
 
     private final BSPTree tree;
-    protected final EventProcessor eventProcessor = EventProcessor.INSTANCE;
 
     public Rectangle visibleArea;
     private float width, height;
-    float mouseX, mouseY; // current world coordinates of mouse
 
     TiledMap map;
 
@@ -47,17 +44,17 @@ public class GameWorld implements Disposable {
 
     final Array<ClickHandler> clickHandlers = new Array<>(1);
 
-    public GameWorld() {
-        log.info("GameWorld constructor");
+    public TemplateWorld() {
+        log.info("TemplateWorld constructor");
 
         visibleArea = new Rectangle();
         tree = new BSPTree(0, 0, 0, 0);
     }
 
+    @Override
     public void initialize() {
-        log.info("GameWorld init");
+        log.info("TemplateWorld init");
         final AssetManager assets = Main.getInstance().assets();
-        RandomGen.setSeed(100389 + 90492);
         RandomGen rand = RandomGen.INSTANCE;
         map = new TiledMap();
         int width = 20;
@@ -75,7 +72,7 @@ public class GameWorld implements Disposable {
             }
         }
         map.getLayers().add(layer);
-        log.debug("Game world initialized");
+        log.debug("TemplateWorld initialized");
     }
 
     public void setSize(float width, float height) {
@@ -105,9 +102,9 @@ public class GameWorld implements Disposable {
      * @param mouseX World mouse x coordinate
      * @param mouseY World mouse y coordinate
      */
+    @Override
     public void update(float delta, float mouseX, float mouseY) {
-        this.mouseX = mouseX;
-        this.mouseY = mouseY;
+        super.update(delta, mouseX, mouseY);
 
         if (!paused) {
             time += delta;
@@ -207,6 +204,7 @@ public class GameWorld implements Disposable {
 
     @Override
     public void dispose() {
+        super.dispose();
         for (GameObject gameObject : gameObjects) {
             gameObject.dispose();
         }

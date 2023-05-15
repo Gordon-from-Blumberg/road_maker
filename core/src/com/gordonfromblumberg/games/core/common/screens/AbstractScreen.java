@@ -25,7 +25,6 @@ public abstract class AbstractScreen implements Screen {
     protected SpriteBatch batch;
     protected Color color = Color.BLACK;
 
-    protected Renderer worldRenderer;
     protected UIRenderer uiRenderer;
 
     protected boolean initialized;
@@ -38,8 +37,8 @@ public abstract class AbstractScreen implements Screen {
         log.info("AbstractScreen.initialize for " + getClass().getSimpleName());
         assets = Main.getInstance().assets();
 
-        createWorldRenderer();
         createUiRenderer();
+        uiRenderer.setAsInputProcessor();
 
         screenWidth = Gdx.graphics.getWidth();
         screenHeight = Gdx.graphics.getHeight();
@@ -69,6 +68,7 @@ public abstract class AbstractScreen implements Screen {
             initialize();
             initialized = true;
         }
+        uiRenderer.setAsInputProcessor();
     }
 
     @Override
@@ -80,16 +80,15 @@ public abstract class AbstractScreen implements Screen {
 
         update(delta);
 
-        if (worldRenderer != null)
-            worldRenderer.render(delta);
+        renderWorld(delta);
 
         uiRenderer.render(delta);
     }
 
+    protected void renderWorld(float delta) {}
+
     @Override
     public void resize(int width, int height) {
-        if (worldRenderer != null)
-            worldRenderer.resize(width, height);
         uiRenderer.resize(width, height);
     }
 
@@ -108,14 +107,6 @@ public abstract class AbstractScreen implements Screen {
     protected void update(float delta) {
     }
 
-    /**
-     * Implementation of AbstractScreen does not create world renderer.
-     * This method should be overridden.
-     */
-    protected void createWorldRenderer() {
-        log.info("AbstractScreen.createWorldRenderer for " + getClass().getSimpleName());
-    }
-
     protected void createUiRenderer() {
         log.info("AbstractScreen.createUiRenderer for " + getClass().getSimpleName());
 
@@ -124,8 +115,6 @@ public abstract class AbstractScreen implements Screen {
 
     @Override
     public void dispose() {
-        if (worldRenderer != null)
-            worldRenderer.dispose();
         uiRenderer.dispose();
     }
 }

@@ -1,4 +1,4 @@
-package com.gordonfromblumberg.games.core.common.world;
+package com.gordonfromblumberg.games.core.game_template;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -12,32 +12,29 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
-import com.badlogic.gdx.math.*;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
-import com.gordonfromblumberg.games.core.common.screens.AbstractRenderer;
+import com.badlogic.gdx.utils.Pools;
 import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.animation.GbAnimation;
 import com.gordonfromblumberg.games.core.common.log.LogManager;
 import com.gordonfromblumberg.games.core.common.log.Logger;
 import com.gordonfromblumberg.games.core.common.model.GameObject;
 import com.gordonfromblumberg.games.core.common.ui.ClickPoint;
+import com.gordonfromblumberg.games.core.common.world.WorldRenderer;
 
 import java.util.Iterator;
 
-public class GameWorldRenderer extends AbstractRenderer {
-    private static final Logger log = LogManager.create(GameWorldRenderer.class);
-
+public class TemplateRenderer extends WorldRenderer<TemplateWorld> {
+    private static final Logger log = LogManager.create(TemplateRenderer.class);
     private static final Color TEMP_COLOR = new Color();
-    private static final Vector3 tempVec3 = new Vector3();
 
-    private final GameWorld world;
     private final Batch batch;
     private final Rectangle worldArea = new Rectangle();
     private IsometricTiledMapRenderer mapRenderer;
     private final ShapeRenderer shapeRenderer = new ShapeRenderer();
-    private final Matrix3 viewToWorld = new Matrix3();
-    private final Matrix3 worldToView = new Matrix3();
 
     final Array<ClickPoint> clickPoints = new Array<>();
 
@@ -45,11 +42,11 @@ public class GameWorldRenderer extends AbstractRenderer {
     private final Color pauseColor = Color.GRAY;
     final BitmapFontCache pauseText;
 
-    public GameWorldRenderer(GameWorld world, Batch batch) {
-        super();
-        log.info("GameWorldRenderer constructor");
+    public TemplateRenderer(TemplateWorld world, Batch batch) {
+        super(world);
+        log.info("TemplateRenderer constructor");
+
         this.batch = batch;
-        this.world = world;
 
         pauseText = new BitmapFontCache(Main.getInstance().assets()
                 .get("ui/uiskin.json", Skin.class)
@@ -58,7 +55,7 @@ public class GameWorldRenderer extends AbstractRenderer {
     }
 
     public void initialize() {
-        log.info("GameWorldRenderer init");
+        log.info("TemplateRenderer init");
         final AssetManager assets = Main.getInstance().assets();
 
         background = assets
@@ -69,9 +66,9 @@ public class GameWorldRenderer extends AbstractRenderer {
         TiledMapTileLayer l = (TiledMapTileLayer) world.getMap().getLayers().get("map");
         viewport.getCamera().position.set(l.getWidth() * l.getTileWidth() / 2f, 0, 0);
         viewToWorld.set(new float[] {
-                 1.0f / l.getTileWidth(),  1.0f / l.getTileWidth(),  0.0f,
+                1.0f / l.getTileWidth(),  1.0f / l.getTileWidth(),  0.0f,
                 -1.0f / l.getTileHeight(), 1.0f / l.getTileHeight(), 0.0f,
-                 0.5f,                    -0.5f,                     1.0f
+                0.5f,                    -0.5f,                     1.0f
         });
         worldToView.set(viewToWorld).inv();
     }
@@ -107,11 +104,12 @@ public class GameWorldRenderer extends AbstractRenderer {
             shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
             shapeRenderer.setColor(0f, 1f, 0f, 1f);
             final Iterator<ClickPoint> it = clickPoints.iterator();
+            final Vector3 vec3 = Pools.obtain(Vector3.class);
             while (it.hasNext()) {
                 ClickPoint cp = it.next();
                 float x = cp.getX();
                 float y = cp.getY();
-                worldToView(tempVec3.set(x, y, 1));
+                worldToView(vec3.set(x, y, 1));
                 GbAnimation animation = cp.getAnimation();
                 animation.update(dt);
                 final float circleMul = cp.getCircle();
@@ -125,6 +123,7 @@ public class GameWorldRenderer extends AbstractRenderer {
                     cp.release();
                 }
             }
+            Pools.free(vec3);
             shapeRenderer.end();
 
             batch.begin();
@@ -138,25 +137,12 @@ public class GameWorldRenderer extends AbstractRenderer {
         batch.end();
     }
 
-    /**
-     * Transforms viewport coordinates to logical world
-     */
-    public void viewToWorld(float x, float y, Vector3 out) {
-        out.set(x, y, 1f).mul(viewToWorld);
-    }
-
-    /**
-     * Transforms logical world to viewport coordinates
-     */
-    public void worldToView(Vector3 coords) {
-        coords.z = 1.0f;
-        coords.mul(worldToView);
-    }
-
     public void click(float x, float y) {
+        Vector3 tempVec3 = Pools.obtain(Vector3.class);
         worldToView(tempVec3.set(x, y, 1));
         ClickPoint cp = ClickPoint.getInstance();
         clickPoints.add(cp.init(tempVec3.x, tempVec3.y));
+        Pools.free(tempVec3);
     }
 
     private void updateCamera() {

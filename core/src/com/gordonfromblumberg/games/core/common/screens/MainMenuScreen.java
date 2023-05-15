@@ -10,7 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.log.LogManager;
 import com.gordonfromblumberg.games.core.common.log.Logger;
-import com.gordonfromblumberg.games.core.common.world.GameScreen;
+import com.gordonfromblumberg.games.core.game_template.TemplateScreen;
 
 public class MainMenuScreen extends AbstractScreen {
     private static final Logger log = LogManager.create(MainMenuScreen.class);
@@ -40,7 +40,7 @@ public class MainMenuScreen extends AbstractScreen {
         textButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Main.getInstance().setScreen(new GameScreen(batch));
+                Main.getInstance().setScreen(new TemplateScreen(batch));
             }
         });
         uiRenderer.rootTable.add(textButton);

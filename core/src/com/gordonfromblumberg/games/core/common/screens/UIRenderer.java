@@ -39,8 +39,6 @@ public class UIRenderer extends AbstractRenderer {
         table.setFillParent(true);
         this.rootTable = table;
         this.stage.addActor(table);
-
-        Gdx.input.setInputProcessor(stage);
     }
 
     @Override
@@ -59,6 +57,10 @@ public class UIRenderer extends AbstractRenderer {
 
     public void addListener(InputListener listener) {
         stage.addListener(listener);
+    }
+
+    public void setAsInputProcessor() {
+        Gdx.input.setInputProcessor(stage);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.gordonfromblumberg.games.core.common.world;
+package com.gordonfromblumberg.games.core.game_template;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -11,31 +11,22 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
 import com.gordonfromblumberg.games.core.common.log.LogManager;
 import com.gordonfromblumberg.games.core.common.log.Logger;
-import com.gordonfromblumberg.games.core.common.screens.AbstractScreen;
 import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
+import com.gordonfromblumberg.games.core.common.world.*;
 
-public class GameScreen extends AbstractScreen {
-    private static final Logger log = LogManager.create(GameScreen.class);
+public class TemplateScreen extends WorldScreen<TemplateWorld> {
+    private static final Logger log = LogManager.create(TemplateScreen.class);
 
-    private GameWorld gameWorld;
-    private GameWorldRenderer renderer;
-
-    private final Vector3 viewCoords3 = new Vector3();
-    private final Vector3 worldCoords3 = new Vector3();
-
-    public GameScreen(SpriteBatch batch) {
-        super(batch);
-        log.info("GameScreen constructor");
-        gameWorld = new GameWorld();
+    public TemplateScreen(SpriteBatch batch) {
+        super(batch, new TemplateWorld());
     }
 
     @Override
-    public void initialize() {
+    protected void initialize() {
         super.initialize();
+        log.info("World screen init for " + getClass().getSimpleName());
 
-        log.info("GameScreen init");
-        gameWorld.initialize();
-        renderer.initialize();
+        ((TemplateRenderer) worldRenderer).initialize();
 
         uiRenderer.addListener(new ClickListener(Input.Buttons.LEFT) {
             @Override
@@ -43,11 +34,10 @@ public class GameScreen extends AbstractScreen {
                 if (!event.isHandled()) {
                     x = Gdx.input.getX();
                     y = Gdx.input.getY();
-                    ((GameUIRenderer) uiRenderer).click(Input.Buttons.LEFT, x, y);
-                    renderer.screenToViewport(x, y, viewCoords3);
-                    renderer.viewToWorld(viewCoords3.x, viewCoords3.y, worldCoords3);
-                    renderer.click(worldCoords3.x, worldCoords3.y);
-                    gameWorld.click(Input.Buttons.LEFT, worldCoords3.x, worldCoords3.y);
+                    worldRenderer.screenToViewport(x, y, viewCoords3);
+                    worldRenderer.viewToWorld(viewCoords3.x, viewCoords3.y, worldCoords3);
+                    ((TemplateRenderer) worldRenderer).click(worldCoords3.x, worldCoords3.y);
+                    world.click(Input.Buttons.LEFT, worldCoords3.x, worldCoords3.y);
                 }
             }
         });
@@ -69,35 +59,33 @@ public class GameScreen extends AbstractScreen {
     }
 
     @Override
-    protected void update(float delta) {
-        super.update(delta);
-        int x = Gdx.input.getX();
-        int y = Gdx.input.getY();
-        renderer.screenToViewport(x, y, viewCoords3);
-        renderer.viewToWorld(viewCoords3.x, viewCoords3.y, worldCoords3);
-        gameWorld.update(delta, worldCoords3.x, worldCoords3.y);        // update game state
+    protected void renderWorld(float delta) {
+        worldRenderer.render(delta);
     }
 
     @Override
+    public void resize(int width, int height) {
+        worldRenderer.resize(width, height);
+        uiRenderer.resize(width, height);
+    }
+
     protected void createWorldRenderer() {
-        super.createWorldRenderer();
         log.info("GameScreen.createWorldRenderer");
 
-        worldRenderer = renderer = new GameWorldRenderer(gameWorld, batch);
+        worldRenderer = new TemplateRenderer(world, batch);
     }
 
     @Override
     protected void createUiRenderer() {
-        log.info("GameScreen.createUiRenderer");
-        final GameUIRenderer uiRenderer = new GameUIRenderer(batch, gameWorld,
-                this.renderer::screenToViewport, this.renderer::viewToWorld, this::getWorldCameraParams);
-        this.uiRenderer = uiRenderer;
+        log.info("WorldScreen.createUiRenderer for " + getClass().getSimpleName());
+
+        uiRenderer = new TemplateUIRenderer(batch, world, this::getViewCoords3);
 
         final ConfigManager configManager = AbstractFactory.getInstance().configManager();
 
         final float minZoom = configManager.getFloat("minZoom");
         final float maxZoom = configManager.getFloat("maxZoom");
-        final OrthographicCamera camera = renderer.getCamera();
+        final OrthographicCamera camera = worldRenderer.getCamera();
         uiRenderer.addListener(new InputListener() {
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY) {
@@ -117,7 +105,7 @@ public class GameScreen extends AbstractScreen {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
                 if (keycode == Input.Keys.SPACE) {
-                    gameWorld.pause();
+                    world.pause();
                     return true;
                 }
                 return false;
@@ -125,15 +113,13 @@ public class GameScreen extends AbstractScreen {
         });
     }
 
-    private void getWorldCameraParams(GameUIRenderer.WorldCameraParams params) {
-        params.position.set(renderer.getCamera().position);
-        params.zoom = renderer.getCamera().zoom;
+    public Vector3 getViewCoords3() {
+        return viewCoords3;
     }
 
     @Override
     public void dispose() {
-        gameWorld.dispose();
-
-        super.dispose();
+        worldRenderer.dispose();
+        uiRenderer.dispose();
     }
 }
