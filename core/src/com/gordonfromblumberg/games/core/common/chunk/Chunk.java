@@ -1,48 +1,36 @@
 package com.gordonfromblumberg.games.core.common.chunk;
 
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
-import com.gordonfromblumberg.games.core.common.utils.IntVector2;
 
 import java.util.Iterator;
 
-public class Chunk<T> implements Iterable<ChunkItem<T>> {
-    private final Pool<ChunkItem<T>> chunkItemPool = new Pool<ChunkItem<T>>() {
+public class Chunk<T> implements Iterable<ChunkObject<T>> {
+    private static final Pool<ChunkObject> chunkObjectPool = new Pool<ChunkObject>() {
         @Override
-        protected ChunkItem<T> newObject() {
-            return new ChunkItem<>();
+        protected ChunkObject newObject() {
+            return new ChunkObject<>();
         }
     };
 
-    final Array<ChunkItem<T>> objects = new Array<>();
-    final IntVector2 bottomLeft = new IntVector2();
-    final IntVector2 bottomRight = new IntVector2();
-    final IntVector2 topLeft = new IntVector2();
-    final IntVector2 topRight = new IntVector2();
+    final Array<ChunkObject<T>> objects = new Array<>();
+    final Rectangle bounds = new Rectangle();
 
-    Chunk(int x, int y, int size, int gridWidth, int gridHeight) {
-        int right = x * size + size - 1;
-        if (right >= gridWidth)
-            right = gridWidth - 1;
-        int top = y * size + size - 1;
-        if (top >= gridHeight)
-            top = gridHeight - 1;
-
-        bottomLeft.set(x * size, y * size);
-        bottomRight.set(right, y * size);
-        topLeft.set(x * size, top);
-        topRight.set(right, top);
+    Chunk(int x, int y, float width, float height) {
+        bounds.set(x * width, y * height, width, height);
     }
 
-    void addObject(T object, int x, int y) {
-        objects.add(chunkItemPool.obtain().set(x, y, object));
+    void addObject(T object, float x, float y) {
+        objects.add(chunkObjectPool.obtain().set(x, y, object));
     }
 
-    // O(n) of objects inside chunk
     void removeObject(T object) {
-        Iterator<ChunkItem<T>> it = objects.iterator();
+        Iterator<ChunkObject<T>> it = objects.iterator();
         while (it.hasNext()) {
-            if (it.next().object == object) {
+            ChunkObject<T> chunkObject = it.next();
+            if (chunkObject.object == object) {
+                chunkObjectPool.free(chunkObject);
                 it.remove();
                 break;
             }
@@ -50,7 +38,7 @@ public class Chunk<T> implements Iterable<ChunkItem<T>> {
     }
 
     @Override
-    public Iterator<ChunkItem<T>> iterator() {
+    public Iterator<ChunkObject<T>> iterator() {
         return objects.iterator();
     }
 }

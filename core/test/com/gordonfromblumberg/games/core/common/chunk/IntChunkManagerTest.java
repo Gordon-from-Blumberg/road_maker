@@ -11,8 +11,8 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ChunkManagerTest {
-    private final ChunkManager<IntVector2> chunkManager = new ChunkManager<>(100, 50, 16);
+public class IntChunkManagerTest {
+    private final IntChunkManager<IntVector2> chunkManager = new IntChunkManager<>(100, 50, 16);
 
     static Stream<Arguments> arguments() {
         return Stream.of(
