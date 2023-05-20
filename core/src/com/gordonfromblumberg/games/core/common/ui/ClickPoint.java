@@ -22,7 +22,7 @@ public class ClickPoint implements Poolable {
     static {
         clickCircle.addStop(0, 0);
         clickCircle.addStop(1, 1);
-        clickCircle.setTimingFunction(TimingFunction.QUADRATIC);
+        clickCircle.timingFunction(TimingFunction.QUADRATIC);
     }
 
     GbAnimation animation;
@@ -38,7 +38,7 @@ public class ClickPoint implements Poolable {
         this.x = x;
         this.y = y;
         final GbAnimation anim = GbAnimation.getInstance();
-        anim.setDuration(DURATION)
+        anim.duration(DURATION)
             .addFloat(CLICK_CIRCLE, clickCircle);
         this.animation = anim;
         return this;

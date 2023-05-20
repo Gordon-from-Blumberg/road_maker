@@ -17,6 +17,8 @@ public class GbAnimation implements Poolable {
     private float duration; // in seconds
     private float runningTime;
     private float process;
+    private boolean infinite;
+    private boolean forwardAndBack;
 
     private GbAnimation() {}
 
@@ -36,7 +38,13 @@ public class GbAnimation implements Poolable {
 
     public void update(float dt) {
         runningTime += dt;
+        if (infinite && runningTime > duration) {
+            runningTime -= duration;
+        }
         process = runningTime / duration;
+        if (forwardAndBack) {
+            process = process < 0.5f ? 2 * process : 2 - 2 * process;
+        }
     }
 
     public float getFloat(int index) {
@@ -47,8 +55,18 @@ public class GbAnimation implements Poolable {
         return runningTime >= duration;
     }
 
-    public GbAnimation setDuration(float duration) {
+    public GbAnimation duration(float duration) {
         this.duration = duration;
+        return this;
+    }
+
+    public GbAnimation infinite(boolean infinite) {
+        this.infinite = infinite;
+        return this;
+    }
+
+    public GbAnimation forwardAndBack(boolean forwardAndBack) {
+        this.forwardAndBack = forwardAndBack;
         return this;
     }
 

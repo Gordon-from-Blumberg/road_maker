@@ -35,7 +35,7 @@ public class AnimatedParameterFloat implements Poolable {
         return this;
     }
 
-    public AnimatedParameterFloat setTimingFunction(TimingFunction timingFunction) {
+    public AnimatedParameterFloat timingFunction(TimingFunction timingFunction) {
         this.timingFunction = timingFunction;
         return this;
     }
@@ -43,6 +43,9 @@ public class AnimatedParameterFloat implements Poolable {
     public float getValue(float t) {
         if (timingFunction != null) {
             t = timingFunction.calculate(t);
+        }
+        if (stopValues.isEmpty()) {
+            return t;
         }
         if (t <= stopPositions.get(0)) {
             return stopValues.get(0);
