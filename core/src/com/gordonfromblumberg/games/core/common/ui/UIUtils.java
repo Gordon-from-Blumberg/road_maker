@@ -5,7 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.gordonfromblumberg.games.core.common.Main;
+import com.gordonfromblumberg.games.core.common.debug.DebugOptions;
 
 public class UIUtils {
     private UIUtils() {}
@@ -64,7 +64,7 @@ public class UIUtils {
     public static Table createTable() {
         Table table = new Table();
 
-        if (Main.DEBUG_UI) {
+        if (DebugOptions.DEBUG_UI) {
             table.debugAll();
         }
 

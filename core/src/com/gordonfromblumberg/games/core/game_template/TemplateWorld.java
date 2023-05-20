@@ -57,8 +57,8 @@ public class TemplateWorld extends World {
         final AssetManager assets = Main.getInstance().assets();
         RandomGen rand = RandomGen.INSTANCE;
         map = new TiledMap();
-        int width = 20;
-        int height = 40;
+        int width = 30;
+        int height = 30;
         TiledMapTileLayer layer = new TiledMapTileLayer(width, height, 100, 50);
         layer.setName("map");
         for (int i = 0; i < width; ++i) {

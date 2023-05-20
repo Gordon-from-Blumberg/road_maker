@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.gordonfromblumberg.games.core.common.Main;
+import com.gordonfromblumberg.games.core.common.debug.DebugOptions;
 import com.gordonfromblumberg.games.core.common.log.LogManager;
 import com.gordonfromblumberg.games.core.common.log.Logger;
 import com.gordonfromblumberg.games.core.common.screens.UIRenderer;
@@ -34,7 +35,7 @@ public class WorldUIRenderer<T extends World> extends UIRenderer {
         this.world = world;
         this.viewCoords = viewCoords;
 
-        if (Main.DEBUG) {
+        if (DebugOptions.DEBUG) {
             final AssetManager assets = Main.getInstance().assets();
             final Skin uiSkin = assets.get("ui/uiskin.json", Skin.class);
             Window debugWindow = createCoordsDebugWindow(uiSkin);

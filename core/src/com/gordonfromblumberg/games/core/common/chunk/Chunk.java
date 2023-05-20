@@ -17,8 +17,8 @@ public class Chunk<T> implements Iterable<ChunkObject<T>> {
     final Array<ChunkObject<T>> objects = new Array<>();
     final Rectangle bounds = new Rectangle();
 
-    Chunk(int x, int y, float width, float height) {
-        bounds.set(x * width, y * height, width, height);
+    Chunk(int x, int y, float width, float height, Rectangle world) {
+        bounds.set(x * width + world.x, y * height + world.y, width, height);
     }
 
     void addObject(T object, float x, float y) {
@@ -35,6 +35,10 @@ public class Chunk<T> implements Iterable<ChunkObject<T>> {
                 break;
             }
         }
+    }
+
+    public Rectangle getBounds() {
+        return bounds;
     }
 
     @Override

@@ -4,7 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IdentityMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Queue;
-import com.gordonfromblumberg.games.core.common.Main;
+import com.gordonfromblumberg.games.core.common.debug.DebugOptions;
 import com.gordonfromblumberg.games.core.common.log.LogManager;
 import com.gordonfromblumberg.games.core.common.log.Logger;
 
@@ -40,7 +40,7 @@ public class EventProcessor {
             final Event event = queue.removeFirst();
             final Array<EventHandler> handlerList = handlers.get(event.getType());
 
-            if (Main.DEBUG)
+            if (DebugOptions.DEBUG)
                 log.debug("Process event '" + event.getType() + "', registered handlers " + handlerList.size);
 
             if (handlerList != null) {

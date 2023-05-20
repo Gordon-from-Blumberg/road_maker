@@ -7,7 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.gordonfromblumberg.games.core.common.Main;
+import com.gordonfromblumberg.games.core.common.debug.DebugOptions;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
 import com.gordonfromblumberg.games.core.common.log.LogManager;
 import com.gordonfromblumberg.games.core.common.log.Logger;
@@ -31,7 +31,7 @@ public class UIRenderer extends AbstractRenderer {
 
         this.centerCamera = true;
         this.stage = new Stage(viewport, batch);
-        if (Main.DEBUG_UI) {
+        if (DebugOptions.DEBUG_UI) {
             stage.setDebugAll(true);
         }
 
