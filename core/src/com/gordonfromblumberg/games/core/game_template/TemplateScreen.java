@@ -100,17 +100,7 @@ public class TemplateScreen extends WorldScreen<TemplateWorld> {
                 return true;
             }
         });
-
-        uiRenderer.addListener(new InputListener() {
-            @Override
-            public boolean keyDown(InputEvent event, int keycode) {
-                if (keycode == Input.Keys.SPACE) {
-                    world.pause();
-                    return true;
-                }
-                return false;
-            }
-        });
+        addPauseListener();
     }
 
     public Vector3 getViewCoords3() {

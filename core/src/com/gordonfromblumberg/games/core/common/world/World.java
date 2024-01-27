@@ -10,6 +10,8 @@ public class World implements Disposable {
 
     protected float mouseX, mouseY; // current world coordinates of mouse
 
+    protected boolean paused;
+
     public void initialize() {}
 
     /**
@@ -36,6 +38,10 @@ public class World implements Disposable {
 
     public void pushEvent(Event event) {
         eventProcessor.push(event);
+    }
+
+    public void pause() {
+        this.paused = !this.paused;
     }
 
     @Override
