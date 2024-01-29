@@ -40,9 +40,11 @@ public class MainMenuScreen extends AbstractScreen {
         textButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+//                ConfigManager config = AbstractFactory.getInstance().configManager();
+//                worldParams.save(config.getConfigPreferences());
+//                config.flushPreferences();
                 Main.getInstance().setScreen(new TemplateScreen(batch));
             }
         });
-        uiRenderer.rootTable.add(textButton);
     }
 }
