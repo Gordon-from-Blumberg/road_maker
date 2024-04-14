@@ -46,5 +46,7 @@ public class MainMenuScreen extends AbstractScreen {
                 Main.getInstance().setScreen(new TemplateScreen(batch));
             }
         });
+
+        uiRenderer.rootTable.add(textButton);
     }
 }
