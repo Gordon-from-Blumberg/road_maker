@@ -1,2 +1,2 @@
-# game_template
-Template projects for games on LibGDX
+# road_maker
+Experimental algorithm to join some points by roads
