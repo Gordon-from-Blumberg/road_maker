@@ -7,11 +7,11 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
 import com.gordonfromblumberg.games.core.common.log.LogManager;
 import com.gordonfromblumberg.games.core.common.log.Logger;
 import com.gordonfromblumberg.games.core.common.ui.SaveLoadWindow;
+import com.gordonfromblumberg.games.core.common.utils.Assets;
 import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
 import com.gordonfromblumberg.games.core.common.world.WorldUIRenderer;
 
@@ -33,7 +33,7 @@ public class TemplateUIRenderer extends WorldUIRenderer<TemplateWorld> {
 
     private void init() {
         final ConfigManager configManager = AbstractFactory.getInstance().configManager();
-        final AssetManager assets = Main.getInstance().assets();
+        final AssetManager assets = Assets.manager();
         final Skin uiSkin = assets.get("ui/uiskin.json", Skin.class);
 
         stage.addListener(new InputListener() {

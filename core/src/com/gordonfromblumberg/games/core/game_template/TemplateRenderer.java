@@ -17,12 +17,12 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
-import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.animation.GbAnimation;
 import com.gordonfromblumberg.games.core.common.log.LogManager;
 import com.gordonfromblumberg.games.core.common.log.Logger;
 import com.gordonfromblumberg.games.core.common.model.GameObject;
 import com.gordonfromblumberg.games.core.common.ui.ClickPoint;
+import com.gordonfromblumberg.games.core.common.utils.Assets;
 import com.gordonfromblumberg.games.core.common.world.WorldRenderer;
 
 import java.util.Iterator;
@@ -48,7 +48,7 @@ public class TemplateRenderer extends WorldRenderer<TemplateWorld> {
 
         this.batch = batch;
 
-        pauseText = new BitmapFontCache(Main.getInstance().assets()
+        pauseText = new BitmapFontCache(Assets.manager()
                 .get("ui/uiskin.json", Skin.class)
                 .getFont("default-font"));
         pauseText.setText("PAUSE", 100, 100);
@@ -56,7 +56,7 @@ public class TemplateRenderer extends WorldRenderer<TemplateWorld> {
 
     public void initialize() {
         log.info("TemplateRenderer init");
-        final AssetManager assets = Main.getInstance().assets();
+        final AssetManager assets = Assets.manager();
 
         background = assets
                 .get("image/texture_pack.atlas", TextureAtlas.class)

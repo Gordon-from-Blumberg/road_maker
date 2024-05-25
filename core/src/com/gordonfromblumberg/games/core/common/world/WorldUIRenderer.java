@@ -9,12 +9,12 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
-import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.debug.DebugOptions;
 import com.gordonfromblumberg.games.core.common.log.LogManager;
 import com.gordonfromblumberg.games.core.common.log.Logger;
 import com.gordonfromblumberg.games.core.common.screens.UIRenderer;
 import com.gordonfromblumberg.games.core.common.ui.UpdatableLabel;
+import com.gordonfromblumberg.games.core.common.utils.Assets;
 
 import java.util.function.Supplier;
 
@@ -35,7 +35,7 @@ public class WorldUIRenderer<T extends World> extends UIRenderer {
         this.viewCoords = viewCoords;
 
         if (DebugOptions.DEBUG) {
-            final AssetManager assets = Main.getInstance().assets();
+            final AssetManager assets = Assets.manager();
             final Skin uiSkin = assets.get("ui/uiskin.json", Skin.class);
             Window debugWindow = createCoordsDebugWindow(uiSkin);
             debugWindow.setWidth(250);
