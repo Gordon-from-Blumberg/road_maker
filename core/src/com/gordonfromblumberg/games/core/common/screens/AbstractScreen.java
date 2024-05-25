@@ -9,9 +9,9 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.log.LogManager;
 import com.gordonfromblumberg.games.core.common.log.Logger;
+import com.gordonfromblumberg.games.core.common.utils.Assets;
 
 public abstract class AbstractScreen implements Screen {
     private static final Logger log = LogManager.create(AbstractScreen.class);
@@ -35,7 +35,7 @@ public abstract class AbstractScreen implements Screen {
 
     protected void initialize() {
         log.info("AbstractScreen.initialize for " + getClass().getSimpleName());
-        assets = Main.getInstance().assets();
+        assets = Assets.manager();
 
         createUiRenderer();
         uiRenderer.setAsInputProcessor();
