@@ -12,7 +12,7 @@ import com.gordonfromblumberg.games.core.common.log.FileLogAppender;
 import com.gordonfromblumberg.games.core.common.log.LogManager;
 import com.gordonfromblumberg.games.core.common.log.Logger;
 import com.gordonfromblumberg.games.core.common.screens.AbstractScreen;
-import com.gordonfromblumberg.games.core.common.screens.MainMenuScreen;
+import com.gordonfromblumberg.games.core.common.screens.MainScreen;
 import com.gordonfromblumberg.games.core.common.utils.*;
 
 import java.io.File;
@@ -29,7 +29,6 @@ public class Main extends Game {
 	private ConfigManager configManager;
 
 	private SpriteBatch batch;
-	private MainMenuScreen mainMenuScreen;
 
 	public static Main createInstance() {
 		instance = new Main();
@@ -79,8 +78,8 @@ public class Main extends Game {
 
 		Assets.manager().finishLoading();
 		this.batch = new SpriteBatch();
-		this.mainMenuScreen = new MainMenuScreen(batch);
-		setScreen(mainMenuScreen);
+		MainScreen screen = new MainScreen(batch);
+		setScreen(screen);
 		int width = configManager.getInteger("screenWidth");
 		int height = configManager.getInteger("screenHeight");
 		Gdx.graphics.setWindowedMode(width, height);
@@ -90,10 +89,6 @@ public class Main extends Game {
 	public AbstractScreen getCurrentScreen() {
 		return (AbstractScreen) screen;
 	}
-
-	public void goToMainMenu() {
-	    setScreen(mainMenuScreen);
-    }
 
 	/**
 	 * Adds custom json loader to asset manager

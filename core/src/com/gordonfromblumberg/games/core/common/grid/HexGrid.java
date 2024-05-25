@@ -1,6 +1,8 @@
 package com.gordonfromblumberg.games.core.common.grid;
 
-public class HexGrid {
+import com.gordonfromblumberg.games.core.common.graph.Graph;
+
+public class HexGrid implements Graph {
     static final float xIntersection = 0.5f;
     final int hexWidth;
     final int hexHeight;

@@ -11,7 +11,7 @@ import com.gordonfromblumberg.games.core.common.log.LogManager;
 import com.gordonfromblumberg.games.core.common.log.Logger;
 import com.gordonfromblumberg.games.core.common.screens.AbstractScreen;
 
-public class WorldScreen<T extends World> extends AbstractScreen {
+public abstract class WorldScreen<T extends World> extends AbstractScreen {
     private static final Logger log = LogManager.create(WorldScreen.class);
 
     protected final T world;
@@ -63,7 +63,7 @@ public class WorldScreen<T extends World> extends AbstractScreen {
         uiRenderer.resize(width, height);
     }
 
-    protected void createWorldRenderer() {}
+    protected abstract void createWorldRenderer();
 
     @Override
     protected void createUiRenderer() {

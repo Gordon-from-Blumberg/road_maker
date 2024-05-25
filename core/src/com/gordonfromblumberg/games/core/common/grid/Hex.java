@@ -8,6 +8,5 @@ public class Hex {
         this.x = x;
         this.y = y;
         this.tiles = new String[layerCount];
-        this.tiles[0] = "tile03"; //todo remove
     }
 }

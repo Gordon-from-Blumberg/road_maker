@@ -103,10 +103,6 @@ public class TemplateScreen extends WorldScreen<TemplateWorld> {
         addPauseListener();
     }
 
-    public Vector3 getViewCoords3() {
-        return viewCoords3;
-    }
-
     @Override
     public void dispose() {
         worldRenderer.dispose();
