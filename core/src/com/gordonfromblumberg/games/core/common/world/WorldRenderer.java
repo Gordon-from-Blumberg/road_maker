@@ -20,11 +20,6 @@ public class WorldRenderer<T extends World> extends AbstractRenderer {
         this.world = world;
     }
 
-    @Override
-    public void render(float dt) {
-
-    }
-
     /**
      * Transforms viewport coordinates to logical world
      */

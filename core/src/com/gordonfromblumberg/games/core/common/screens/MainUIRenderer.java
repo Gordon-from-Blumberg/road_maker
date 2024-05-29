@@ -6,12 +6,15 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
 import com.badlogic.gdx.utils.Align;
+import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
 import com.gordonfromblumberg.games.core.common.ui.IntChangeableLabel;
 import com.gordonfromblumberg.games.core.common.ui.UIUtils;
 import com.gordonfromblumberg.games.core.common.utils.Assets;
+import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
 import com.gordonfromblumberg.games.core.common.world.MainWorld;
 import com.gordonfromblumberg.games.core.common.world.MainWorldParams;
 import com.gordonfromblumberg.games.core.common.world.WorldUIRenderer;
@@ -24,11 +27,14 @@ public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
     public MainUIRenderer(SpriteBatch batch, MainWorld world, Supplier<Vector3> viewCoords) {
         super(batch, world, viewCoords);
 
+        final ConfigManager config = AbstractFactory.getInstance().configManager();
+
         rootTable.add().expandX();
 
         final Skin skin = Assets.manager().get("ui/uiskin.json", Skin.class);
 
         Table table = UIUtils.createTable(skin);
+        table.setBackground(skin.getDrawable("default-round-large"));
         table.defaults().pad(2f);
         table.columnDefaults(0).align(Align.right);
         table.columnDefaults(1).align(Align.left);
@@ -45,9 +51,13 @@ public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
         table.add("Height");
         table.add(heightLabel);
 
-        rootTable.add(table).width(300);
+        table.row();
+        table.add(generateButton(skin)).colspan(2);
+
+        rootTable.add(table).width(config.getFloat("ui.width"));
 
         rootTable.row().expandY();
+        rootTable.add();
     }
 
     private IntChangeableLabel sizeLabel(Skin skin, IntConsumer onChangeListener) {
@@ -74,5 +84,9 @@ public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
         });
 
         return box;
+    }
+
+    private TextButton generateButton(Skin skin) {
+        return UIUtils.textButton("Generate", skin, world::createGrid, null);
     }
 }

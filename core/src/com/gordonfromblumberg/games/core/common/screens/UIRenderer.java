@@ -43,6 +43,8 @@ public class UIRenderer extends AbstractRenderer {
 
     @Override
     public void render(float dt) {
+        super.render(dt);
+
         stage.act();
         stage.draw();
     }

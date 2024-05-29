@@ -156,6 +156,6 @@ public class TemplateRenderer extends WorldRenderer<TemplateWorld> {
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
             camera.translate(0, -cameraSpeed);
 
-        camera.update();
+        viewport.apply(centerCamera);
     }
 }

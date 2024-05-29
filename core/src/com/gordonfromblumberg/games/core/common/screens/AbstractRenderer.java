@@ -26,6 +26,11 @@ public abstract class AbstractRenderer implements Renderer {
     }
 
     @Override
+    public void render(float dt) {
+        viewport.apply(centerCamera);
+    }
+
+    @Override
     public void resize(int width, int height) {
         viewport.update(width, height, centerCamera);
     }

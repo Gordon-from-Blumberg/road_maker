@@ -2,7 +2,9 @@ package com.gordonfromblumberg.games.core.common.grid;
 
 import com.gordonfromblumberg.games.core.common.graph.Graph;
 
-public class HexGrid implements Graph {
+import java.util.Iterator;
+
+public class HexGrid implements Graph, Iterable<HexRow> {
     static final float xIntersection = 0.5f;
     final int hexWidth;
     final int hexHeight;
@@ -15,6 +17,8 @@ public class HexGrid implements Graph {
 
     final HexRow[] rows;
     final int layerCount;
+    int minX, maxX;
+    private int iteratorIndex = 0;
 
     public HexGrid(int hexWidth, int hexHeight, float incline, int rowCount, int layerCount) {
         this.hexWidth = hexWidth;
@@ -24,6 +28,10 @@ public class HexGrid implements Graph {
         this.yIntersection = incline / this.dy;
         this.rows = new HexRow[rowCount];
         this.layerCount = layerCount;
+    }
+
+    public HexRow[] getRows() {
+        return rows;
     }
 
     public Hex findHex(float x, float y) {
@@ -65,6 +73,46 @@ public class HexGrid implements Graph {
 
     public float getWorldY(Hex hex) {
         return hex.y * dy;
+    }
+
+    public int getMinX() {
+        return minX;
+    }
+
+    public int getMaxX() {
+        return maxX;
+    }
+
+    public int getMaxY() {
+        return rows.length - 1;
+    }
+
+    private final Iterator<HexRow> iterator = new Iterator<>() {
+        @Override
+        public boolean hasNext() {
+            return iteratorIndex < rows.length;
+        }
+
+        @Override
+        public HexRow next() {
+            return rows[iteratorIndex++];
+        }
+    };
+
+    @Override
+    public Iterator<HexRow> iterator() {
+        iteratorIndex = 0;
+        return iterator;
+    }
+
+    void calcBounds() {
+        int minX = rows[0].minX, maxX = rows[0].maxX;
+        for (HexRow row : rows) {
+            if (row.minX < minX) minX = row.minX;
+            if (row.maxX > maxX) maxX = row.maxX;
+        }
+        this.minX = minX;
+        this.maxX = maxX;
     }
 
     private float dist2(Hex hex, float x, float y) {

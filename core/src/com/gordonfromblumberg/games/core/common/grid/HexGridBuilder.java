@@ -13,7 +13,7 @@ public class HexGridBuilder {
                 row.hexes.put(i, hex);
             }
         }
-
+        hexGrid.calcBounds();
         return hexGrid;
     }
 }
