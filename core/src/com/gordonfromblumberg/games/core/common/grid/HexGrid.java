@@ -3,16 +3,20 @@ package com.gordonfromblumberg.games.core.common.grid;
 import com.gordonfromblumberg.games.core.common.graph.Graph;
 
 import java.util.Iterator;
+import java.util.function.IntUnaryOperator;
 
 public class HexGrid implements Graph, Iterable<HexRow> {
     static final float xIntersection = 0.5f;
+    static final int[] dy = {0, 1, 1, 0, -1, -1};
+    static final IntUnaryOperator[] dx = {y -> 1, y -> y % 2, y -> y % 2 - 1, y -> -1, y -> y % 2 - 1, y -> y % 2};
+
     final int hexWidth;
     final int hexHeight;
     final float incline;
     /**
      * Distance by 'y' between hex centres in related rows
      */
-    final float dy;
+    final float rowDist;
     final float yIntersection;
 
     final HexRow[] rows;
@@ -24,14 +28,23 @@ public class HexGrid implements Graph, Iterable<HexRow> {
         this.hexWidth = hexWidth;
         this.hexHeight = hexHeight;
         this.incline = incline;
-        this.dy = hexHeight - incline;
-        this.yIntersection = incline / this.dy;
+        this.rowDist = hexHeight - incline;
+        this.yIntersection = incline / this.rowDist;
         this.rows = new HexRow[rowCount];
         this.layerCount = layerCount;
     }
 
     public HexRow[] getRows() {
         return rows;
+    }
+
+    public Hex getHex(int x, int y) {
+        if (y < 0 || y >= rows.length)
+            return null;
+        HexRow row = rows[y];
+        if (x < row.minX || x > row.maxX)
+            return null;
+        return row.hexes.get(x);
     }
 
     public Hex findHex(float x, float y) {
@@ -43,7 +56,7 @@ public class HexGrid implements Graph, Iterable<HexRow> {
         else
             minX = maxX;
 
-        float ky = (y + hexHeight / 2f) / dy;
+        float ky = (y + hexHeight / 2f) / rowDist;
         if (ky - (maxY = (int)ky) < yIntersection)
             minY = maxY - 1;
         else
@@ -72,7 +85,7 @@ public class HexGrid implements Graph, Iterable<HexRow> {
     }
 
     public float getWorldY(Hex hex) {
-        return hex.y * dy;
+        return hex.y * rowDist;
     }
 
     public int getMinX() {
@@ -113,6 +126,23 @@ public class HexGrid implements Graph, Iterable<HexRow> {
         }
         this.minX = minX;
         this.maxX = maxX;
+    }
+
+    void createEdges(float weight) {
+        for (HexRow row : rows) {
+            for (int x = row.minX, max = row.maxX; x <= max; ++x) {
+                Hex hex = row.hexes.get(x);
+
+                for (int i = 0; i < 6; ++i) {
+                    int nx = dx[i].applyAsInt(hex.y) + x;
+                    int ny = dy[i] + hex.y;
+                    Hex nHex = getHex(nx, ny);
+                    if (nHex != null) {
+                        hex.edges[i] = new HexEdge(nHex, weight);
+                    }
+                }
+            }
+        }
     }
 
     private float dist2(Hex hex, float x, float y) {

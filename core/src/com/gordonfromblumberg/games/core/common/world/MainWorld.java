@@ -26,7 +26,11 @@ public class MainWorld extends World {
     }
 
     public void createGrid() {
-        grid = HexGridBuilder.rect(params.width,params.height, hexWidth, hexHeight, hexIncline, 1);
+        grid = HexGridBuilder.start()
+                .rect(params.width,params.height)
+                .hexParams(hexWidth, hexHeight, hexIncline)
+                .weight(5)
+                .build();
         gridCreated = true;
     }
 }

@@ -18,7 +18,7 @@ public class MainWorldRenderer extends WorldRenderer<MainWorld> {
     static final float hexHeightHalf;
     static final float hexIncline;
     static final float hexDy;
-    static final Color hexColor = new Color(Color.GREEN).mul(0.8f);
+    static final Color hexColor = new Color(Color.GREEN).mul(0.7f);
 
     static {
         final ConfigManager config = AbstractFactory.getInstance().configManager();
@@ -39,7 +39,7 @@ public class MainWorldRenderer extends WorldRenderer<MainWorld> {
     @Override
     public void render(float dt) {
         if (world.gridCreated) {
-            setWorldSize();
+            resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             world.gridCreated = false;
         }
 
@@ -93,10 +93,9 @@ public class MainWorldRenderer extends WorldRenderer<MainWorld> {
     public void resize(int width, int height) {
         final ConfigManager config = AbstractFactory.getInstance().configManager();
 
-        int screenWidth = Gdx.graphics.getWidth() - config.getInteger("ui.width");
-        int screenHeight = Gdx.graphics.getHeight();
+        int screenWidth = width - config.getInteger("ui.width");
         setWorldSize();
-        viewport.update(screenWidth, screenHeight, false);
+        viewport.update(screenWidth, height, false);
     }
 
     private void setWorldSize() {

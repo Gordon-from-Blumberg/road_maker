@@ -41,7 +41,7 @@ public class HexGridRenderer {
             float halfWidth = hexGrid.hexWidth / 2f;
             batch.draw(region,
                     hex.x * hexGrid.hexWidth - halfWidth - xOffset + hex.y % 2 * halfWidth,
-                    hex.y * hexGrid.dy - hexGrid.hexHeight / 2f - yOffset);
+                    hex.y * hexGrid.rowDist - hexGrid.hexHeight / 2f - yOffset);
         }
     }
 
@@ -52,7 +52,7 @@ public class HexGridRenderer {
         final float halfHeight = hexHeight / 2f;
         final int xOffset = this.xOffset;
         final int yOffset = this.yOffset;
-        final float dy = hexGrid.dy;
+        final float dy = hexGrid.rowDist;
 
         for (int y = hexGrid.rows.length - 1; y >= 0; --y) {
             final HexRow row = hexGrid.rows[y];
