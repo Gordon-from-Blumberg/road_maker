@@ -18,7 +18,9 @@ public class MainWorldRenderer extends WorldRenderer<MainWorld> {
     static final float hexHeightHalf;
     static final float hexIncline;
     static final float hexDy;
-    static final Color hexColor = new Color(Color.GREEN).mul(0.7f);
+    static final Color emptyHexColor = new Color(Color.GREEN).mul(0.7f);
+    static final Color cityColor = new Color(Color.CORAL);
+    static final Color obstacleColor = new Color(Color.WHITE).mul(0.2f);
 
     static {
         final ConfigManager config = AbstractFactory.getInstance().configManager();
@@ -47,7 +49,7 @@ public class MainWorldRenderer extends WorldRenderer<MainWorld> {
 
         shapeRenderer.setProjectionMatrix(viewport.getCamera().combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(hexColor);
+        shapeRenderer.setColor(emptyHexColor);
         if (world.grid != null) {
             for (HexRow row : world.grid) {
                 for (Hex hex : row) {
@@ -70,6 +72,14 @@ public class MainWorldRenderer extends WorldRenderer<MainWorld> {
     private void drawHexFilled(Hex hex) {
         final float x = world.grid.getWorldX(hex);
         final float y = world.grid.getWorldY(hex);
+        Object hexObject = hex.getObject();
+        if (hexObject == null) {
+            shapeRenderer.setColor(emptyHexColor);
+        } else if (hexObject == HexType.city) {
+            shapeRenderer.setColor(cityColor);
+        } else {
+            shapeRenderer.setColor(obstacleColor);
+        }
         shapeRenderer.triangle(x, y, x + hexWidthHalf, y - hexDy, x + hexWidthHalf, y + hexDy);
         shapeRenderer.triangle(x, y, x + hexWidthHalf, y + hexDy, x, y + hexHeightHalf);
         shapeRenderer.triangle(x, y, x, y + hexHeightHalf, x - hexWidthHalf, y + hexDy);

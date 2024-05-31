@@ -1,9 +1,14 @@
 package com.gordonfromblumberg.games.core.common.world;
 
 public class MainWorldParams {
+    public static final int DEFAULT_CITY_COUNT = 5;
+    public static final int DEFAULT_OBSTACLE_LEVEL = 1;
+
     GridShape shape = GridShape.RECT;
     int width;
     int height;
+    int cityCount = DEFAULT_CITY_COUNT;
+    int obstacleLevel = DEFAULT_OBSTACLE_LEVEL;
 
     public GridShape getShape() {
         return shape;
@@ -27,6 +32,22 @@ public class MainWorldParams {
 
     public void setHeight(int height) {
         this.height = height;
+    }
+
+    public int getCityCount() {
+        return cityCount;
+    }
+
+    public void setCityCount(int cityCount) {
+        this.cityCount = cityCount;
+    }
+
+    public int getObstacleLevel() {
+        return obstacleLevel;
+    }
+
+    public void setObstacleLevel(int obstacleLevel) {
+        this.obstacleLevel = obstacleLevel;
     }
 
     public enum GridShape {

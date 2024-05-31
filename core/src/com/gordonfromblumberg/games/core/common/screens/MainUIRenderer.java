@@ -23,6 +23,7 @@ import java.util.function.IntConsumer;
 import java.util.function.Supplier;
 
 public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
+    private static final float FIELD_WIDTH = 45f;
 
     public MainUIRenderer(SpriteBatch batch, MainWorld world, Supplier<Vector3> viewCoords) {
         super(batch, world, viewCoords);
@@ -39,22 +40,31 @@ public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
         table.columnDefaults(0).align(Align.right);
         table.columnDefaults(1).align(Align.left);
 
-        IntChangeableLabel heightLabel = sizeLabel(skin, v -> world.getParams().setHeight(v));
+        final MainWorldParams params = world.getParams();
+        IntChangeableLabel heightLabel = sizeLabel(skin, params::setHeight);
         table.add("Grid shape");
-        table.add(shapeSelector(skin, heightLabel));
+        table.add(shapeSelector(skin, heightLabel)).fillX();
 
         table.row();
         table.add("Width");
-        table.add(sizeLabel(skin, v -> world.getParams().setWidth(v)));
+        table.add(sizeLabel(skin, params::setWidth));
 
         table.row();
         table.add("Height");
         table.add(heightLabel);
 
         table.row();
-        table.add(generateButton(skin)).colspan(2);
+        table.add("City count");
+        table.add(cityCountLabel(skin, params::setCityCount));
 
-        rootTable.add(table).width(config.getFloat("ui.width"));
+        table.row();
+        table.add("Obstacles level");
+        table.add(obstacleLevelLabel(skin, params::setObstacleLevel));
+
+        table.row();
+        table.add(generateButton(skin)).colspan(2).align(Align.center);
+
+        rootTable.add(table);
 
         rootTable.row().expandY();
         rootTable.add();
@@ -66,8 +76,28 @@ public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
         sizeLabel.setMaxValue(255);
         sizeLabel.setValue(20);
         sizeLabel.setStep(5);
-        sizeLabel.setFieldWidth(45);
+        sizeLabel.setFieldWidth(FIELD_WIDTH);
         return sizeLabel;
+    }
+
+    private IntChangeableLabel cityCountLabel(Skin skin, IntConsumer onChangeListener) {
+        IntChangeableLabel label = new IntChangeableLabel(skin, onChangeListener);
+        label.setMinValue(3);
+        label.setMaxValue(16);
+        label.setValue(MainWorldParams.DEFAULT_CITY_COUNT);
+        label.setStep(1);
+        label.setFieldWidth(FIELD_WIDTH);
+        return label;
+    }
+
+    private IntChangeableLabel obstacleLevelLabel(Skin skin, IntConsumer onChangeListener) {
+        IntChangeableLabel label = new IntChangeableLabel(skin, onChangeListener);
+        label.setMinValue(0);
+        label.setMaxValue(3);
+        label.setValue(MainWorldParams.DEFAULT_OBSTACLE_LEVEL);
+        label.setStep(1);
+        label.setFieldWidth(FIELD_WIDTH);
+        return label;
     }
 
     private SelectBox<MainWorldParams.GridShape> shapeSelector(Skin skin, Disableable heightLabel) {
@@ -87,6 +117,6 @@ public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
     }
 
     private TextButton generateButton(Skin skin) {
-        return UIUtils.textButton("Generate", skin, world::createGrid, null);
+        return UIUtils.textButton("Generate grid", skin, world::createGrid, null);
     }
 }

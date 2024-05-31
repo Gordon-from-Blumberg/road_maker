@@ -1,9 +1,14 @@
 package com.gordonfromblumberg.games.core.common.world;
 
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
+import com.gordonfromblumberg.games.core.common.grid.Hex;
 import com.gordonfromblumberg.games.core.common.grid.HexGrid;
 import com.gordonfromblumberg.games.core.common.grid.HexGridBuilder;
+import com.gordonfromblumberg.games.core.common.grid.HexRow;
 import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
+import com.gordonfromblumberg.games.core.common.utils.RandomGen;
 
 public class MainWorld extends World {
     static final int hexWidth;
@@ -18,6 +23,9 @@ public class MainWorld extends World {
     }
 
     final MainWorldParams params = new MainWorldParams();
+    final Array<Hex> emptyHexes = new Array<>();
+    final ObjectSet<Hex> passableHexes = new ObjectSet<>();
+
     HexGrid grid;
     boolean gridCreated = false;
 
@@ -32,5 +40,55 @@ public class MainWorld extends World {
                 .weight(5)
                 .build();
         gridCreated = true;
+
+        fillLists();
+
+        generateCities();
+        generateObstacles();
+    }
+
+    private void generateCities() {
+        int n = params.cityCount;
+
+        while (n-- > 0) {
+            Hex hex = RandomGen.INSTANCE.getRandomItem(emptyHexes);
+            hex.setObject(HexType.city);
+            emptyHexes.removeValue(hex, true);
+        }
+    }
+
+    private void generateObstacles() {
+        int n = params.obstacleLevel * grid.getHexCount() / 16;
+
+        while (n-- > 0) {
+            Hex hex = RandomGen.INSTANCE.getRandomItem(emptyHexes);
+            hex.setObject(HexType.obstacle);
+            emptyHexes.removeValue(hex, true);
+            passableHexes.remove(hex);
+        }
+    }
+
+    private void clearLists() {
+        emptyHexes.clear();
+        passableHexes.clear();
+    }
+
+    private void cleanGrid() {
+        clearLists();
+        for (final HexRow row : grid) {
+            for (final Hex hex : row) {
+                hex.setObject(null);
+            }
+        }
+    }
+
+    private void fillLists() {
+        clearLists();
+        for (final HexRow row : grid) {
+            for (final Hex hex : row) {
+                emptyHexes.add(hex);
+                passableHexes.add(hex);
+            }
+        }
     }
 }

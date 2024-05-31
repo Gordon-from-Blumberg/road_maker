@@ -20,6 +20,7 @@ public class HexGrid implements Graph, Iterable<HexRow> {
     final float yIntersection;
 
     final HexRow[] rows;
+    int hexCount;
     final int layerCount;
     int minX, maxX;
     private int iteratorIndex = 0;
@@ -45,6 +46,10 @@ public class HexGrid implements Graph, Iterable<HexRow> {
         if (x < row.minX || x > row.maxX)
             return null;
         return row.hexes.get(x);
+    }
+
+    public int getHexCount() {
+        return hexCount;
     }
 
     public Hex findHex(float x, float y) {
@@ -119,11 +124,14 @@ public class HexGrid implements Graph, Iterable<HexRow> {
     }
 
     void calcBounds() {
+        int hexCount = 0;
         int minX = rows[0].minX, maxX = rows[0].maxX;
         for (HexRow row : rows) {
+            hexCount += row.maxX - row.minX + 1;
             if (row.minX < minX) minX = row.minX;
             if (row.maxX > maxX) maxX = row.maxX;
         }
+        this.hexCount = hexCount;
         this.minX = minX;
         this.maxX = maxX;
     }
