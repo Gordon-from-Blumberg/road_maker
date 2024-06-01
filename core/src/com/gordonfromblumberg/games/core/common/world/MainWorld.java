@@ -14,20 +14,29 @@ public class MainWorld extends World {
     static final int hexWidth;
     static final int hexHeight;
     static final float hexIncline;
+    public static final Array<Algorithm> algorithms = new Array<>();
 
     static {
         final ConfigManager config = AbstractFactory.getInstance().configManager();
         hexWidth = config.getInteger("hexWidth");
         hexHeight = config.getInteger("hexHeight");
         hexIncline = config.getFloat("hexIncline");
+
+        algorithms.add(StraightforwardAlgorithm.instance());
     }
 
     final MainWorldParams params = new MainWorldParams();
     final Array<Hex> emptyHexes = new Array<>();
     final ObjectSet<Hex> passableHexes = new ObjectSet<>();
+    final Array<Hex> cities = new Array<>();
 
     HexGrid grid;
     boolean gridCreated = false;
+
+    private Algorithm algorithm = StraightforwardAlgorithm.instance();
+
+    private float time;
+    private float updateDelay;
 
     public MainWorldParams getParams() {
         return params;
@@ -47,6 +56,22 @@ public class MainWorld extends World {
         generateObstacles();
     }
 
+    @Override
+    public void update(float delta, float mouseX, float mouseY) {
+        super.update(delta, mouseX, mouseY);
+
+        if (!paused) {
+            time += delta;
+            if (time < updateDelay * algorithm.getStepDelayCoef()) {
+                return;
+            }
+
+            time = 0;
+
+            algorithm.step(this);
+        }
+    }
+
     private void generateCities() {
         int n = params.cityCount;
 
@@ -54,6 +79,7 @@ public class MainWorld extends World {
             Hex hex = RandomGen.INSTANCE.getRandomItem(emptyHexes);
             hex.setObject(HexType.city);
             emptyHexes.removeValue(hex, true);
+            cities.add(hex);
         }
     }
 
@@ -71,6 +97,7 @@ public class MainWorld extends World {
     private void clearLists() {
         emptyHexes.clear();
         passableHexes.clear();
+        cities.clear();
     }
 
     private void cleanGrid() {
@@ -90,5 +117,13 @@ public class MainWorld extends World {
                 passableHexes.add(hex);
             }
         }
+    }
+
+    public void setStepsPerSec(int steps) {
+        updateDelay = 1f / steps;
+    }
+
+    public void setAlgorithm(Algorithm algorithm) {
+        this.algorithm = algorithm;
     }
 }

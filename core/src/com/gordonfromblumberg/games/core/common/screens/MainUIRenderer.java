@@ -15,6 +15,7 @@ import com.gordonfromblumberg.games.core.common.ui.IntChangeableLabel;
 import com.gordonfromblumberg.games.core.common.ui.UIUtils;
 import com.gordonfromblumberg.games.core.common.utils.Assets;
 import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
+import com.gordonfromblumberg.games.core.common.world.Algorithm;
 import com.gordonfromblumberg.games.core.common.world.MainWorld;
 import com.gordonfromblumberg.games.core.common.world.MainWorldParams;
 import com.gordonfromblumberg.games.core.common.world.WorldUIRenderer;
@@ -23,7 +24,7 @@ import java.util.function.IntConsumer;
 import java.util.function.Supplier;
 
 public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
-    private static final float FIELD_WIDTH = 45f;
+    private static final float FIELD_WIDTH = 60f;
 
     public MainUIRenderer(SpriteBatch batch, MainWorld world, Supplier<Vector3> viewCoords) {
         super(batch, world, viewCoords);
@@ -62,7 +63,15 @@ public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
         table.add(obstacleLevelLabel(skin, params::setObstacleLevel));
 
         table.row();
-        table.add(generateButton(skin)).colspan(2).align(Align.center);
+        table.add(generateButton(skin)).colspan(2).align(Align.center).padTop(5f).padBottom(15f);
+
+        table.row();
+        table.add("Steps per second");
+        table.add(stepsLabel(skin, world::setStepsPerSec));
+
+        table.row();
+        table.add("Algorithm");
+        table.add(algorithmSelector(skin));
 
         rootTable.add(table);
 
@@ -100,6 +109,16 @@ public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
         return label;
     }
 
+    private IntChangeableLabel stepsLabel(Skin skin, IntConsumer onChangeListener) {
+        IntChangeableLabel label = new IntChangeableLabel(skin, onChangeListener);
+        label.setMinValue(5);
+        label.setMaxValue(60);
+        label.setValue(10);
+        label.setStep(5);
+        label.setFieldWidth(FIELD_WIDTH);
+        return label;
+    }
+
     private SelectBox<MainWorldParams.GridShape> shapeSelector(Skin skin, Disableable heightLabel) {
         SelectBox<MainWorldParams.GridShape> box = new SelectBox<>(skin);
         box.setItems(MainWorldParams.GridShape.values());
@@ -110,6 +129,20 @@ public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
                 MainWorldParams.GridShape shape = selectBox.getSelected();
                 world.getParams().setShape(shape);
                 heightLabel.setDisabled(shape == MainWorldParams.GridShape.HEX);
+            }
+        });
+
+        return box;
+    }
+
+    private SelectBox<Algorithm> algorithmSelector(Skin skin) {
+        SelectBox<Algorithm> box = new SelectBox<>(skin);
+        box.setItems(MainWorld.algorithms);
+        box.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                SelectBox<Algorithm> selectBox = (SelectBox<Algorithm>) actor;
+                world.setAlgorithm(selectBox.getSelected());
             }
         });
 
