@@ -3,6 +3,7 @@ package com.gordonfromblumberg.games.core.common.grid;
 import com.badlogic.gdx.utils.Array;
 import com.gordonfromblumberg.games.core.common.graph.Edge;
 import com.gordonfromblumberg.games.core.common.graph.Node;
+import com.gordonfromblumberg.games.core.common.utils.CollectionUtils;
 
 public class Hex implements Node {
     public final int x, y;
@@ -25,7 +26,12 @@ public class Hex implements Node {
     }
 
     @Override
-    public void getRelated(Array<Edge> out) {
-        out.addAll(edges);
+    public void next(Array<Edge> out) {
+        CollectionUtils.addNonNull(out, edges);
+    }
+
+    @Override
+    public void prev(Array<Edge> out) {
+        CollectionUtils.addNonNull(out, edges);
     }
 }

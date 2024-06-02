@@ -89,6 +89,7 @@ public class MainWorld extends World {
         while (n-- > 0) {
             Hex hex = RandomGen.INSTANCE.getRandomItem(emptyHexes);
             hex.setObject(HexType.obstacle);
+            grid.removeEdges(hex);
             emptyHexes.removeValue(hex, true);
             passableHexes.remove(hex);
         }

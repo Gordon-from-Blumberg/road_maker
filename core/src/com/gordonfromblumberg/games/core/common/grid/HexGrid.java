@@ -1,5 +1,8 @@
 package com.gordonfromblumberg.games.core.common.grid;
 
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pools;
+import com.gordonfromblumberg.games.core.common.graph.Edge;
 import com.gordonfromblumberg.games.core.common.graph.Graph;
 
 import java.util.Iterator;
@@ -82,6 +85,16 @@ public class HexGrid implements Graph, Iterable<HexRow> {
         }
 
         return hex;
+    }
+
+    public void removeEdges(Hex hex) {
+        for (int i = 0; i < 6; ++i) {
+            if (hex.edges[i] != null) {
+                Hex neib = hex.edges[i].hex;
+                neib.edges[(i + 3) % 6] = null;
+                hex.edges[i] = null;
+            }
+        }
     }
 
     public float getWorldX(Hex hex) {
