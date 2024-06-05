@@ -1,9 +1,8 @@
 package com.gordonfromblumberg.games.core.common.grid;
 
 import com.gordonfromblumberg.games.core.common.graph.Edge;
-import com.gordonfromblumberg.games.core.common.graph.Node;
 
-class HexEdge implements Edge {
+class HexEdge implements Edge<Hex> {
     final Hex hex;
     float weight;
 
@@ -17,7 +16,7 @@ class HexEdge implements Edge {
     }
 
     @Override
-    public Node getNode() {
+    public Hex getNode() {
         return hex;
     }
 
