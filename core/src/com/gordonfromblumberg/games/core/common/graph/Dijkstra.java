@@ -2,6 +2,7 @@ package com.gordonfromblumberg.games.core.common.graph;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Pools;
 
 import java.util.Comparator;
@@ -19,6 +20,7 @@ public class Dijkstra<T extends Node> {
 
     private final PathRetriever<T> pathRetriever = new PathRetriever<>();
     private final TargetCondition<T> targetCondition = new TargetCondition<>();
+    private final NodeSetCondition<T> nodeSetCondition = new NodeSetCondition<>();
     private final BiConsumer<Graph<T>, ObjectMap<T, Float>> nothing = (g, m) -> {};
 
     public void findPath(Graph<T> graph, T start, T target, Array<T> out) {
@@ -27,6 +29,10 @@ public class Dijkstra<T extends Node> {
 
     public void markNodes(Graph<T> graph, T start, ObjectMap<T, Float> out) {
         algorithm(graph, start, out, nothing, (Predicate<T>) falseCondition);
+    }
+
+    public void markNodes(Graph<T> graph, T start, ObjectMap<T, Float> out, Array<T> nodeList) {
+        algorithm(graph, start, out, nothing, nodeSetCondition.set(nodeList));
     }
 
     void algorithm(Graph<T> graph, T start, ObjectMap<T, Float> map,
@@ -144,6 +150,20 @@ public class Dijkstra<T extends Node> {
 
         TargetCondition<T> set(T target) {
             this.target = target;
+            return this;
+        }
+    }
+
+    private static class NodeSetCondition<T extends Node> implements Predicate<T> {
+        private final ObjectSet<T> nodes = new ObjectSet<>();
+
+        @Override
+        public boolean test(T t) {
+            return nodes.isEmpty();
+        }
+
+        NodeSetCondition<T> set(Array<T> nodeList) {
+            nodes.addAll(nodeList);
             return this;
         }
     }
