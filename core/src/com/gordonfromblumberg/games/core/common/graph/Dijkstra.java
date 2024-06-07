@@ -4,8 +4,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Pools;
+import com.gordonfromblumberg.games.core.common.utils.ValueMapComparator;
 
-import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
@@ -15,7 +15,7 @@ public class Dijkstra<T extends Node> {
     private static final Predicate<Node> falseCondition = node -> false;
 
     private final ObjectMap<T, Float> map = new ObjectMap<>();
-    private final NodeComparator<T> nodeComparator = new NodeComparator<>(map);
+    private final ValueMapComparator<T> nodeComparator = new ValueMapComparator<>(map);
     private final PriorityQueue<T> queue = new PriorityQueue<>(nodeComparator);
 
     private final PathRetriever<T> pathRetriever = new PathRetriever<>();
@@ -80,26 +80,6 @@ public class Dijkstra<T extends Node> {
         map.clear();
     }
 
-    private static class NodeComparator<T extends Node> implements Comparator<T> {
-        private ObjectMap<T, Float> valueMap;
-
-        NodeComparator(ObjectMap<T, Float> valueMap) {
-            this.valueMap = valueMap;
-        }
-
-        @Override
-        public int compare(T n1, T n2) {
-            float d = valueMap.get(n1) - valueMap.get(n2);
-            if (d > 0) return 1;
-            else if (d < 0) return -1;
-            else return 0;
-        }
-
-        void setValueMap(ObjectMap<T, Float> valueMap) {
-            this.valueMap = valueMap;
-        }
-    }
-
     private static class PathRetriever<T extends Node> implements BiConsumer<Graph<T>, ObjectMap<T, Float>> {
         T target;
         Array<T> out;
@@ -159,6 +139,7 @@ public class Dijkstra<T extends Node> {
 
         @Override
         public boolean test(T t) {
+            nodes.remove(t);
             return nodes.isEmpty();
         }
 

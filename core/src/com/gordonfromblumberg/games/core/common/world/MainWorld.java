@@ -37,6 +37,7 @@ public class MainWorld extends World {
 
     private float time;
     private float updateDelay;
+    private boolean finished;
 
     public MainWorldParams getParams() {
         return params;
@@ -68,7 +69,8 @@ public class MainWorld extends World {
 
             time = 0;
 
-            algorithm.step(this);
+            if (!finished)
+                finished = algorithm.step(this);
         }
     }
 

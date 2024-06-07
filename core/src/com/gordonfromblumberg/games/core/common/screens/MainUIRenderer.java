@@ -23,6 +23,7 @@ import com.gordonfromblumberg.games.core.common.world.WorldUIRenderer;
 import java.util.function.IntConsumer;
 import java.util.function.Supplier;
 
+@SuppressWarnings("unchecked")
 public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
     private static final float FIELD_WIDTH = 60f;
 
@@ -121,7 +122,7 @@ public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
 
     private SelectBox<MainWorldParams.GridShape> shapeSelector(Skin skin, Disableable heightLabel) {
         SelectBox<MainWorldParams.GridShape> box = new SelectBox<>(skin);
-        box.setItems(MainWorldParams.GridShape.values());
+        box.setItems(MainWorldParams.GridShape.RECT);
         box.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
