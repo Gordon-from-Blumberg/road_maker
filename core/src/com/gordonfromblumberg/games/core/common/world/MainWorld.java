@@ -14,6 +14,8 @@ public class MainWorld extends World {
     static final int hexWidth;
     static final int hexHeight;
     static final float hexIncline;
+    static final float defaultWeight = 3f;
+    static final float roadWeight = 1f;
     public static final Array<Algorithm> algorithms = new Array<>();
 
     static {
@@ -38,6 +40,7 @@ public class MainWorld extends World {
     private float time;
     private float updateDelay;
     private boolean finished;
+    private boolean running;
 
     public MainWorldParams getParams() {
         return params;
@@ -47,7 +50,7 @@ public class MainWorld extends World {
         grid = HexGridBuilder.start()
                 .rect(params.width,params.height)
                 .hexParams(hexWidth, hexHeight, hexIncline)
-                .weight(5)
+                .weight(defaultWeight)
                 .build();
         gridCreated = true;
 
@@ -55,13 +58,15 @@ public class MainWorld extends World {
 
         generateCities();
         generateObstacles();
+
+        algorithm.reset();
     }
 
     @Override
     public void update(float delta, float mouseX, float mouseY) {
         super.update(delta, mouseX, mouseY);
 
-        if (!paused) {
+        if (!paused && running) {
             time += delta;
             if (time < updateDelay * algorithm.getStepDelayCoef()) {
                 return;
@@ -72,6 +77,11 @@ public class MainWorld extends World {
             if (!finished)
                 finished = algorithm.step(this);
         }
+    }
+
+    public void run() {
+        running = true;
+        finished = false;
     }
 
     private void generateCities() {

@@ -74,6 +74,9 @@ public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
         table.add("Algorithm");
         table.add(algorithmSelector(skin));
 
+        table.row();
+        table.add(runButton(skin)).colspan(2).align(Align.center).padTop(5f).padBottom(15f);
+
         rootTable.add(table);
 
         rootTable.row().expandY();
@@ -152,5 +155,9 @@ public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
 
     private TextButton generateButton(Skin skin) {
         return UIUtils.textButton("Generate grid", skin, world::createGrid, null);
+    }
+
+    private TextButton runButton(Skin skin) {
+        return UIUtils.textButton("Run algorithm", skin, world::run, null);
     }
 }

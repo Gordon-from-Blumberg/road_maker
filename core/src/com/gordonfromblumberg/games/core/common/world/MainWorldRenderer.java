@@ -4,10 +4,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
+import com.gordonfromblumberg.games.core.common.graph.Edge;
 import com.gordonfromblumberg.games.core.common.grid.Hex;
+import com.gordonfromblumberg.games.core.common.grid.HexGrid;
 import com.gordonfromblumberg.games.core.common.grid.HexRow;
 import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
 
@@ -21,6 +25,9 @@ public class MainWorldRenderer extends WorldRenderer<MainWorld> {
     static final Color emptyHexColor = new Color(Color.GREEN).mul(0.7f);
     static final Color cityColor = new Color(Color.CORAL);
     static final Color obstacleColor = new Color(Color.WHITE).mul(0.2f);
+    static final Color roadColor = new Color(.65f, .5f, .1f, 1f);
+
+    private static final Vector2 vec2 = new Vector2();
 
     static {
         final ConfigManager config = AbstractFactory.getInstance().configManager();
@@ -56,6 +63,11 @@ public class MainWorldRenderer extends WorldRenderer<MainWorld> {
                     drawHexFilled(hex);
                 }
             }
+            for (HexRow row : world.grid) {
+                for (Hex hex : row) {
+                    drawRoads(hex);
+                }
+            }
             shapeRenderer.end();
 
             shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
@@ -70,8 +82,9 @@ public class MainWorldRenderer extends WorldRenderer<MainWorld> {
     }
 
     private void drawHexFilled(Hex hex) {
-        final float x = world.grid.getWorldX(hex);
-        final float y = world.grid.getWorldY(hex);
+        final HexGrid grid = world.grid;
+        final float hexX = grid.getWorldX(hex);
+        final float hexY = grid.getWorldY(hex);
         Object hexObject = hex.getObject();
         if (hexObject == null) {
             shapeRenderer.setColor(emptyHexColor);
@@ -80,12 +93,44 @@ public class MainWorldRenderer extends WorldRenderer<MainWorld> {
         } else {
             shapeRenderer.setColor(obstacleColor);
         }
-        shapeRenderer.triangle(x, y, x + hexWidthHalf, y - hexDy, x + hexWidthHalf, y + hexDy);
-        shapeRenderer.triangle(x, y, x + hexWidthHalf, y + hexDy, x, y + hexHeightHalf);
-        shapeRenderer.triangle(x, y, x, y + hexHeightHalf, x - hexWidthHalf, y + hexDy);
-        shapeRenderer.triangle(x, y, x - hexWidthHalf, y + hexDy, x - hexWidthHalf, y - hexDy);
-        shapeRenderer.triangle(x, y, x - hexWidthHalf, y - hexDy, x, y - hexHeightHalf);
-        shapeRenderer.triangle(x, y, x, y - hexHeightHalf, x + hexWidthHalf, y - hexDy);
+        shapeRenderer.triangle(hexX, hexY, hexX + hexWidthHalf, hexY - hexDy, hexX + hexWidthHalf, hexY + hexDy);
+        shapeRenderer.triangle(hexX, hexY, hexX + hexWidthHalf, hexY + hexDy, hexX, hexY + hexHeightHalf);
+        shapeRenderer.triangle(hexX, hexY, hexX, hexY + hexHeightHalf, hexX - hexWidthHalf, hexY + hexDy);
+        shapeRenderer.triangle(hexX, hexY, hexX - hexWidthHalf, hexY + hexDy, hexX - hexWidthHalf, hexY - hexDy);
+        shapeRenderer.triangle(hexX, hexY, hexX - hexWidthHalf, hexY - hexDy, hexX, hexY - hexHeightHalf);
+        shapeRenderer.triangle(hexX, hexY, hexX, hexY - hexHeightHalf, hexX + hexWidthHalf, hexY - hexDy);
+    }
+
+    private void drawRoads(Hex hex) {
+        final HexGrid grid = world.grid;
+        final float hexX = grid.getWorldX(hex);
+        final float hexY = grid.getWorldY(hex);
+        shapeRenderer.setColor(roadColor);
+        for (int i = 0; i < 3; ++i) {
+            Edge<Hex> next = grid.next(hex, i);
+            if (next != null) {
+                float weight = next.getWeight();
+                if (weight == MainWorld.defaultWeight)
+                    continue;
+
+                float nextX = grid.getWorldX(next.getNode());
+                float nextY = grid.getWorldY(next.getNode());
+                float halfWidth = MathUtils.map(
+                        MainWorld.defaultWeight, MainWorld.roadWeight,
+                        0, .3f * MainWorld.hexWidth / 2, weight);
+                vec2.set(nextX, nextY).sub(hexX, hexY).setLength(halfWidth);
+                shapeRenderer.circle(hexX, hexY, halfWidth);
+                shapeRenderer.circle(nextX, nextY, halfWidth);
+                shapeRenderer.triangle(
+                        hexX + vec2.y, hexY - vec2.x,
+                        nextX - vec2.y, nextY + vec2.x,
+                        hexX - vec2.y, hexY + vec2.x);
+                shapeRenderer.triangle(
+                        hexX + vec2.y, hexY - vec2.x,
+                        nextX + vec2.y, nextY - vec2.x,
+                        nextX - vec2.y, nextY + vec2.x);
+            }
+        }
     }
 
     private void drawHex(Hex hex) {

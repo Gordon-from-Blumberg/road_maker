@@ -42,7 +42,7 @@ public class StraightforwardAlgorithm implements Algorithm {
         }
 
         if (cityIdx == cityMap.size) {
-            if (roadIdx++ == cityIdx - 1) {
+            if (++roadIdx == cityIdx - 1) {
                 return true;
             }
             cityIdx = 0;

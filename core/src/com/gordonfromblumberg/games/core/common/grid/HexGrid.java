@@ -112,6 +112,10 @@ public class HexGrid implements Graph<Hex>, Iterable<HexRow> {
         CollectionUtils.addNonNull(out, node.edges);
     }
 
+    public Edge<Hex> next(Hex node, int dir) {
+        return node.edges[dir];
+    }
+
     @Override
     public void prev(Hex node, Array<Edge<Hex>> out) {
         CollectionUtils.addNonNull(out, node.edges);
