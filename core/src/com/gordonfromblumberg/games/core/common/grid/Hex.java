@@ -21,4 +21,12 @@ public class Hex implements Node {
     public void setObject(Object object) {
         this.object = object;
     }
+
+    public void setTile(int layer, String tile) {
+        tiles[layer] = tile;
+    }
+
+    public String getTile(int layer) {
+        return tiles[layer];
+    }
 }

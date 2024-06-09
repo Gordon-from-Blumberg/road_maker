@@ -1,5 +1,7 @@
 package com.gordonfromblumberg.games.core.common.world;
 
+import com.badlogic.gdx.Preferences;
+
 public class MainWorldParams {
     public static final int DEFAULT_CITY_COUNT = 5;
     public static final int DEFAULT_OBSTACLE_LEVEL = 1;
@@ -9,6 +11,8 @@ public class MainWorldParams {
     int height;
     int cityCount = DEFAULT_CITY_COUNT;
     int obstacleLevel = DEFAULT_OBSTACLE_LEVEL;
+    float defaultWeight = MainWorld.defaultWeight;
+    float roadWeight = MainWorld.roadWeight;
 
     public GridShape getShape() {
         return shape;
@@ -53,5 +57,25 @@ public class MainWorldParams {
     public enum GridShape {
         RECT,
         HEX
+    }
+
+    public void save(Preferences prefs) {
+        prefs.putString("shape", shape.name());
+        prefs.putInteger("width", width);
+        prefs.putInteger("height", height);
+        prefs.putInteger("cityCount", cityCount);
+        prefs.putInteger("obstacleLevel", obstacleLevel);
+        prefs.putFloat("defaultWeight", defaultWeight);
+        prefs.putFloat("roadWeight", roadWeight);
+    }
+
+    public void load(Preferences prefs) {
+        shape = GridShape.valueOf(prefs.getString("shape", shape.name()));
+        width = prefs.getInteger("width", width);
+        height = prefs.getInteger("height", height);
+        cityCount = prefs.getInteger("cityCount", cityCount);
+        obstacleLevel = prefs.getInteger("obstacleLevel", obstacleLevel);
+        defaultWeight = prefs.getFloat("defaultWeight", defaultWeight);
+        roadWeight = prefs.getFloat("roadWeight", roadWeight);
     }
 }

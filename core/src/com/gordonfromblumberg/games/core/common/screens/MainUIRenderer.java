@@ -43,13 +43,13 @@ public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
         table.columnDefaults(1).align(Align.left);
 
         final MainWorldParams params = world.getParams();
-        IntChangeableLabel heightLabel = sizeLabel(skin, params::setHeight);
+        IntChangeableLabel heightLabel = sizeLabel(skin, params::setHeight, params.getHeight());
         table.add("Grid shape");
         table.add(shapeSelector(skin, heightLabel)).fillX();
 
         table.row();
         table.add("Width");
-        table.add(sizeLabel(skin, params::setWidth));
+        table.add(sizeLabel(skin, params::setWidth, params.getWidth()));
 
         table.row();
         table.add("Height");
@@ -57,18 +57,18 @@ public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
 
         table.row();
         table.add("City count");
-        table.add(cityCountLabel(skin, params::setCityCount));
+        table.add(cityCountLabel(skin, params::setCityCount, params.getCityCount()));
 
         table.row();
         table.add("Obstacles level");
-        table.add(obstacleLevelLabel(skin, params::setObstacleLevel));
+        table.add(obstacleLevelLabel(skin, params::setObstacleLevel, params.getObstacleLevel()));
 
         table.row();
         table.add(generateButton(skin)).colspan(2).align(Align.center).padTop(5f).padBottom(15f);
 
         table.row();
         table.add("Steps per second");
-        table.add(stepsLabel(skin, world::setStepsPerSec));
+        table.add(stepsLabel(skin, world::setStepsPerSec, world.getStepsPerSec()));
 
         table.row();
         table.add("Algorithm");
@@ -83,41 +83,41 @@ public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
         rootTable.add();
     }
 
-    private IntChangeableLabel sizeLabel(Skin skin, IntConsumer onChangeListener) {
+    private IntChangeableLabel sizeLabel(Skin skin, IntConsumer onChangeListener, int value) {
         IntChangeableLabel sizeLabel = new IntChangeableLabel(skin, onChangeListener);
         sizeLabel.setMinValue(5);
         sizeLabel.setMaxValue(255);
-        sizeLabel.setValue(20);
+        sizeLabel.setValue(value);
         sizeLabel.setStep(5);
         sizeLabel.setFieldWidth(FIELD_WIDTH);
         return sizeLabel;
     }
 
-    private IntChangeableLabel cityCountLabel(Skin skin, IntConsumer onChangeListener) {
+    private IntChangeableLabel cityCountLabel(Skin skin, IntConsumer onChangeListener, int value) {
         IntChangeableLabel label = new IntChangeableLabel(skin, onChangeListener);
         label.setMinValue(3);
         label.setMaxValue(16);
-        label.setValue(MainWorldParams.DEFAULT_CITY_COUNT);
+        label.setValue(value);
         label.setStep(1);
         label.setFieldWidth(FIELD_WIDTH);
         return label;
     }
 
-    private IntChangeableLabel obstacleLevelLabel(Skin skin, IntConsumer onChangeListener) {
+    private IntChangeableLabel obstacleLevelLabel(Skin skin, IntConsumer onChangeListener, int value) {
         IntChangeableLabel label = new IntChangeableLabel(skin, onChangeListener);
         label.setMinValue(0);
         label.setMaxValue(3);
-        label.setValue(MainWorldParams.DEFAULT_OBSTACLE_LEVEL);
+        label.setValue(value);
         label.setStep(1);
         label.setFieldWidth(FIELD_WIDTH);
         return label;
     }
 
-    private IntChangeableLabel stepsLabel(Skin skin, IntConsumer onChangeListener) {
+    private IntChangeableLabel stepsLabel(Skin skin, IntConsumer onChangeListener, int value) {
         IntChangeableLabel label = new IntChangeableLabel(skin, onChangeListener);
         label.setMinValue(5);
         label.setMaxValue(60);
-        label.setValue(10);
+        label.setValue(value);
         label.setStep(5);
         label.setFieldWidth(FIELD_WIDTH);
         return label;
@@ -126,6 +126,7 @@ public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
     private SelectBox<MainWorldParams.GridShape> shapeSelector(Skin skin, Disableable heightLabel) {
         SelectBox<MainWorldParams.GridShape> box = new SelectBox<>(skin);
         box.setItems(MainWorldParams.GridShape.RECT);
+        box.setSelected(world.getParams().getShape());
         box.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -142,6 +143,7 @@ public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
     private SelectBox<Algorithm> algorithmSelector(Skin skin) {
         SelectBox<Algorithm> box = new SelectBox<>(skin);
         box.setItems(MainWorld.algorithms);
+        box.setSelected(world.getAlgorithm());
         box.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {

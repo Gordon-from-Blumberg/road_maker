@@ -85,10 +85,10 @@ public class MainWorldRenderer extends WorldRenderer<MainWorld> {
         final HexGrid grid = world.grid;
         final float hexX = grid.getWorldX(hex);
         final float hexY = grid.getWorldY(hex);
-        Object hexObject = hex.getObject();
-        if (hexObject == null) {
+        String hexType = hex.getTile(0);
+        if (hexType == null) {
             shapeRenderer.setColor(emptyHexColor);
-        } else if (hexObject == HexType.city) {
+        } else if (hexType.equals(HexType.CITY)) {
             shapeRenderer.setColor(cityColor);
         } else {
             shapeRenderer.setColor(obstacleColor);
