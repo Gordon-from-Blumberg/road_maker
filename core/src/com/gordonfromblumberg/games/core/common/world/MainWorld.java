@@ -5,6 +5,7 @@ import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
+import com.gordonfromblumberg.games.core.common.graph.Edge;
 import com.gordonfromblumberg.games.core.common.grid.Hex;
 import com.gordonfromblumberg.games.core.common.grid.HexGrid;
 import com.gordonfromblumberg.games.core.common.grid.HexGridBuilder;
@@ -53,9 +54,7 @@ public class MainWorld extends World {
     public void initialize() {
         log.debug("World init");
         Preferences prefs = Gdx.app.getPreferences(LAST_USED_CONFIG_KEY);
-        params.load(prefs);
-        setStepsPerSec(prefs.getInteger("stepsPerSec", getStepsPerSec()));
-        setAlgorithm(prefs.getString("algorithm"));
+        load(prefs);
     }
 
     public MainWorldParams getParams() {
@@ -64,15 +63,13 @@ public class MainWorld extends World {
 
     public void createGrid() {
         Preferences prefs = Gdx.app.getPreferences(LAST_USED_CONFIG_KEY);
-        params.save(prefs);
-        prefs.putInteger("stepsPerSec", getStepsPerSec());
-        prefs.putString("algorithm", algorithm.toString());
+        save(prefs);
         prefs.flush();
 
         grid = HexGridBuilder.start()
                 .rect(params.width,params.height)
                 .hexParams(hexWidth, hexHeight, hexIncline)
-                .weight(defaultWeight)
+                .weight(params.defaultWeight)
                 .layers(1)
                 .build();
         gridCreated = true;
@@ -83,6 +80,18 @@ public class MainWorld extends World {
         generateObstacles();
 
         algorithm.reset();
+    }
+
+    private void load(Preferences prefs) {
+        params.load(prefs);
+        setStepsPerSec(prefs.getInteger("stepsPerSec", getStepsPerSec()));
+        setAlgorithm(prefs.getString("algorithm"));
+    }
+
+    private void save(Preferences prefs) {
+        params.save(prefs);
+        prefs.putInteger("stepsPerSec", getStepsPerSec());
+        prefs.putString("algorithm", algorithm.toString());
     }
 
     @Override
@@ -136,15 +145,6 @@ public class MainWorld extends World {
         cities.clear();
     }
 
-    private void cleanGrid() {
-        clearLists();
-        for (final HexRow row : grid) {
-            for (final Hex hex : row) {
-                hex.setObject(null);
-            }
-        }
-    }
-
     private void fillLists() {
         clearLists();
         for (final HexRow row : grid) {
@@ -179,5 +179,36 @@ public class MainWorld extends World {
 
     public Algorithm getAlgorithm() {
         return algorithm;
+    }
+
+    public void setDefaultWeight(float weight) {
+        params.setDefaultWeight(weight);
+        reset();
+    }
+
+    public void setRoadWeight(float weight) {
+        params.setRoadWeight(weight);
+        reset();
+    }
+
+    void reset() {
+        if (grid == null)
+            return;
+
+        final HexGrid grid = this.grid;
+        final float weight = params.defaultWeight;
+        for (final HexRow row : grid) {
+            for (final Hex hex : row) {
+                for (int i = 0; i < 3; ++i) {
+                    Edge<Hex> next = grid.next(hex, i);
+                    if (next == null)
+                        continue;
+
+                    grid.setWeight(hex, next.getNode(), weight);
+                }
+            }
+        }
+
+        algorithm.reset();
     }
 }

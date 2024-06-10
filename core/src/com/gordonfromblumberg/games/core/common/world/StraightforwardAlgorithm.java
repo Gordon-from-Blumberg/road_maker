@@ -31,14 +31,18 @@ public class StraightforwardAlgorithm implements Algorithm {
         if (cityMap.isEmpty())
             init(world);
 
+        if (cityIdx == cityMap.size)
+            return true;
+
         Hex city = world.cities.get(cityIdx++);
         Array<Hex> otherCities = cityMap.get(city);
 
         array.clear();
         dijkstra.findPath(world.grid, city, otherCities.get(roadIdx), array);
+        float roadWeight = world.getParams().roadWeight;
 
         for (int i = 0, n = array.size - 1; i < n; ++i) {
-            world.grid.setWeight(array.get(i), array.get(i + 1), 1f);
+            world.grid.setWeight(array.get(i), array.get(i + 1), roadWeight);
         }
 
         if (cityIdx == cityMap.size) {

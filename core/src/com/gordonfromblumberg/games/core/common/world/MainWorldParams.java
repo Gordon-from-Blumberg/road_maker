@@ -54,6 +54,22 @@ public class MainWorldParams {
         this.obstacleLevel = obstacleLevel;
     }
 
+    public float getDefaultWeight() {
+        return defaultWeight;
+    }
+
+    public void setDefaultWeight(float defaultWeight) {
+        this.defaultWeight = defaultWeight;
+    }
+
+    public float getRoadWeight() {
+        return roadWeight;
+    }
+
+    public void setRoadWeight(float roadWeight) {
+        this.roadWeight = roadWeight;
+    }
+
     public enum GridShape {
         RECT,
         HEX

@@ -64,6 +64,14 @@ public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
         table.add(obstacleLevelLabel(skin, params::setObstacleLevel, params.getObstacleLevel()));
 
         table.row();
+        table.add("Default weight");
+        table.add(weightLabel(skin, world::setDefaultWeight, (int) params.getDefaultWeight()));
+
+        table.row();
+        table.add("Road weight");
+        table.add(weightLabel(skin, world::setRoadWeight, (int) params.getRoadWeight()));
+
+        table.row();
         table.add(generateButton(skin)).colspan(2).align(Align.center).padTop(5f).padBottom(15f);
 
         table.row();
@@ -107,6 +115,16 @@ public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
         IntChangeableLabel label = new IntChangeableLabel(skin, onChangeListener);
         label.setMinValue(0);
         label.setMaxValue(3);
+        label.setValue(value);
+        label.setStep(1);
+        label.setFieldWidth(FIELD_WIDTH);
+        return label;
+    }
+
+    private IntChangeableLabel weightLabel(Skin skin, IntConsumer onChangeListener, int value) {
+        IntChangeableLabel label = new IntChangeableLabel(skin, onChangeListener);
+        label.setMinValue(1);
+        label.setMaxValue(10);
         label.setValue(value);
         label.setStep(1);
         label.setFieldWidth(FIELD_WIDTH);

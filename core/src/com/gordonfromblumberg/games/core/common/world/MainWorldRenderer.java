@@ -105,18 +105,20 @@ public class MainWorldRenderer extends WorldRenderer<MainWorld> {
         final HexGrid grid = world.grid;
         final float hexX = grid.getWorldX(hex);
         final float hexY = grid.getWorldY(hex);
+        final float defaultWeight = world.params.defaultWeight;
+        final float roadWeight = world.params.roadWeight;
         shapeRenderer.setColor(roadColor);
         for (int i = 0; i < 3; ++i) {
             Edge<Hex> next = grid.next(hex, i);
             if (next != null) {
                 float weight = next.getWeight();
-                if (weight == MainWorld.defaultWeight)
+                if (weight == defaultWeight)
                     continue;
 
                 float nextX = grid.getWorldX(next.getNode());
                 float nextY = grid.getWorldY(next.getNode());
                 float halfWidth = MathUtils.map(
-                        MainWorld.defaultWeight, MainWorld.roadWeight,
+                        defaultWeight, roadWeight,
                         0, .3f * MainWorld.hexWidth / 2, weight);
                 vec2.set(nextX, nextY).sub(hexX, hexY).setLength(halfWidth);
                 shapeRenderer.circle(hexX, hexY, halfWidth);
