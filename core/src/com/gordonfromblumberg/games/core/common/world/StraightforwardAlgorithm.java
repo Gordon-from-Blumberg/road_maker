@@ -1,5 +1,8 @@
 package com.gordonfromblumberg.games.core.common.world;
 
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.gordonfromblumberg.games.core.common.graph.Dijkstra;
@@ -8,6 +11,7 @@ import com.gordonfromblumberg.games.core.common.utils.ValueMapComparator;
 
 import java.util.Comparator;
 
+@SuppressWarnings("unchecked")
 public class StraightforwardAlgorithm implements Algorithm {
     private static final StraightforwardAlgorithm instance = new StraightforwardAlgorithm();
     private static final Dijkstra<Hex> dijkstra = new Dijkstra<>();
@@ -16,11 +20,29 @@ public class StraightforwardAlgorithm implements Algorithm {
     private static final Array<Hex> array = new Array<>();
 
     private final ObjectMap<Hex, Array<Hex>> cityMap = new ObjectMap<>();
+    private final Array<AlgorithmParam> params = new Array<>();
 
     private int cityIdx = 0;
     private int roadIdx = 0;
 
-    private StraightforwardAlgorithm() { }
+    private StraightforwardAlgorithm() {
+        params.add(new AlgorithmParam(
+                "Mode",
+                (skin, valueConsumer) -> {
+                    SelectBox<Mode> box = new SelectBox<>(skin);
+                    box.setItems(Mode.values());
+                    box.setSelected(getMode());
+                    box.addListener(new ChangeListener() {
+                        @Override
+                        public void changed(ChangeEvent event, Actor actor) {
+                            SelectBox<Mode> selectBox = (SelectBox<Mode>) actor;
+                            valueConsumer.accept(selectBox.getSelected());
+                        }
+                    });
+                    return box;
+                }
+        ));
+    }
 
     public static StraightforwardAlgorithm instance() {
         return instance;
@@ -66,8 +88,17 @@ public class StraightforwardAlgorithm implements Algorithm {
     }
 
     @Override
+    public Array<AlgorithmParam> getParams() {
+        return params;
+    }
+
+    @Override
     public float getStepDelayCoef() {
         return 1f;
+    }
+
+    private Mode getMode() {
+        return (Mode) params.get(0).getValue();
     }
 
     @Override
@@ -80,5 +111,22 @@ public class StraightforwardAlgorithm implements Algorithm {
     @Override
     public String toString() {
         return "Straightforward";
+    }
+
+    private enum Mode {
+        ONE_PASS("One pass"),
+        TWO_PASS("Two pass");
+
+        private final String name;
+
+        Mode(String name) {
+            this.name = name;
+        }
+
+
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 }

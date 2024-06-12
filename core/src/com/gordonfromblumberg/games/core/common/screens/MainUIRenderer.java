@@ -10,15 +10,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
 import com.gordonfromblumberg.games.core.common.ui.IntChangeableLabel;
 import com.gordonfromblumberg.games.core.common.ui.UIUtils;
+import com.gordonfromblumberg.games.core.common.ui.UpdatableLabel;
 import com.gordonfromblumberg.games.core.common.utils.Assets;
 import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
-import com.gordonfromblumberg.games.core.common.world.Algorithm;
-import com.gordonfromblumberg.games.core.common.world.MainWorld;
-import com.gordonfromblumberg.games.core.common.world.MainWorldParams;
-import com.gordonfromblumberg.games.core.common.world.WorldUIRenderer;
+import com.gordonfromblumberg.games.core.common.world.*;
 
 import java.util.function.IntConsumer;
 import java.util.function.Supplier;
@@ -26,6 +25,8 @@ import java.util.function.Supplier;
 @SuppressWarnings("unchecked")
 public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
     private static final float FIELD_WIDTH = 60f;
+
+    private final Table algorithmParamsTable;
 
     public MainUIRenderer(SpriteBatch batch, MainWorld world, Supplier<Vector3> viewCoords) {
         super(batch, world, viewCoords);
@@ -85,10 +86,25 @@ public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
         table.row();
         table.add(runButton(skin)).colspan(2).align(Align.center).padTop(5f).padBottom(15f);
 
-        rootTable.add(table);
+        table.row();
+        table.add("Algorithm parameters").colspan(2).align(Align.center);
 
-        rootTable.row().expandY();
-        rootTable.add();
+        algorithmParamsTable = UIUtils.createTable(skin);
+        algorithmParamsTable.defaults().pad(2f);
+        algorithmParamsTable.columnDefaults(0).align(Align.right);
+        algorithmParamsTable.columnDefaults(1).align(Align.left);
+
+        table.row();
+        fillAlgorithmParamsTable(world.getAlgorithm().getParams(), skin);
+        table.add(algorithmParamsTable).colspan(2).align(Align.center);
+
+        table.row().expandY().align(Align.bottom);
+        table.add("Status");
+        table.add(new UpdatableLabel(skin, () -> !world.isRunning()
+                ? "Not started" : world.isFinished()
+                ? "Finished" : "In progress"));
+
+        rootTable.add(table).fillY().expandY();
     }
 
     private IntChangeableLabel sizeLabel(Skin skin, IntConsumer onChangeListener, int value) {
@@ -166,11 +182,23 @@ public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 SelectBox<Algorithm> selectBox = (SelectBox<Algorithm>) actor;
-                world.setAlgorithm(selectBox.getSelected());
+                Algorithm selected = selectBox.getSelected();
+                world.setAlgorithm(selected);
+                fillAlgorithmParamsTable(selected.getParams(), skin);
             }
         });
 
         return box;
+    }
+
+    private void fillAlgorithmParamsTable(Array<AlgorithmParam> params, Skin skin) {
+        algorithmParamsTable.clear();
+
+        for (AlgorithmParam param : params) {
+            algorithmParamsTable.row();
+            algorithmParamsTable.add(param.getName());
+            algorithmParamsTable.add(param.createComponent(skin));
+        }
     }
 
     private TextButton generateButton(Skin skin) {

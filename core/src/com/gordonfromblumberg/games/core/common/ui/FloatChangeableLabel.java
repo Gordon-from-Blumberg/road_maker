@@ -2,24 +2,26 @@ package com.gordonfromblumberg.games.core.common.ui;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
+import com.gordonfromblumberg.games.core.common.utils.FloatConsumer;
 
-import java.util.function.IntConsumer;
-
-public class IntChangeableLabel extends HorizontalGroup implements Disableable {
+public class FloatChangeableLabel extends HorizontalGroup implements Disableable {
     private final Button prev;
     private final Button next;
-    private final IntField valueField;
+    private final FloatField valueField;
 
-    private int step = 1;
+    private float step = 1;
     private ChangeFunction changeFunction = ChangeFunction.linear;
 
-    public IntChangeableLabel(Skin skin, IntConsumer onChangeListener) {
+    public FloatChangeableLabel(Skin skin, FloatConsumer onChangeListener) {
         this.prev = new TextButton("<", skin);
         this.next = new TextButton(">", skin);
-        this.valueField = IntField.builder()
+        this.valueField = FloatField.builder()
                 .skin(skin)
                 .value(0)
                 .handler(onChangeListener)
@@ -32,19 +34,19 @@ public class IntChangeableLabel extends HorizontalGroup implements Disableable {
         addActor(next);
     }
 
-    public void setMinValue(int minValue) {
+    public void setMinValue(float minValue) {
         valueField.minValue = minValue;
     }
 
-    public void setMaxValue(int maxValue) {
+    public void setMaxValue(float maxValue) {
         valueField.maxValue = maxValue;
     }
 
-    public void setValue(int value) {
+    public void setValue(float value) {
         valueField.setValue(value);
     }
 
-    public void setStep(int step) {
+    public void setStep(float step) {
         this.step = step;
     }
 
@@ -83,7 +85,7 @@ public class IntChangeableLabel extends HorizontalGroup implements Disableable {
                 if (valueField.isDisabled())
                     return;
 
-                int v = valueField.getValue();
+                float v = valueField.getValue();
                 switch (changeFunction) {
                     case linear:
                         if (event.getListenerActor() == prev) {

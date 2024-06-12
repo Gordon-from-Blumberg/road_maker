@@ -62,6 +62,9 @@ public class MainWorld extends World {
     }
 
     public void createGrid() {
+        running = false;
+        finished = false;
+
         Preferences prefs = Gdx.app.getPreferences(LAST_USED_CONFIG_KEY);
         save(prefs);
         prefs.flush();
@@ -189,6 +192,14 @@ public class MainWorld extends World {
     public void setRoadWeight(float weight) {
         params.setRoadWeight(weight);
         reset();
+    }
+
+    public boolean isRunning() {
+        return running;
+    }
+
+    public boolean isFinished() {
+        return finished;
     }
 
     void reset() {
