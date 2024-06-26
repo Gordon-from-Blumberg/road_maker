@@ -13,7 +13,7 @@ import java.util.Comparator;
 
 @SuppressWarnings("unchecked")
 public class StraightforwardAlgorithm implements Algorithm {
-    private static final StraightforwardAlgorithm instance = new StraightforwardAlgorithm();
+    private static StraightforwardAlgorithm instance;
     private static final Dijkstra<Hex> dijkstra = new Dijkstra<>();
     private static final ObjectMap<Hex, Float> valueMap = new ObjectMap<>();
     private static final Comparator<Hex> cityComparator = new ValueMapComparator<>(valueMap);
@@ -25,9 +25,10 @@ public class StraightforwardAlgorithm implements Algorithm {
     private int cityIdx = 0;
     private int roadIdx = 0;
 
-    private StraightforwardAlgorithm() {
+    private StraightforwardAlgorithm(MainWorld world) {
         params.add(new AlgorithmParam(
                 "Mode",
+                Mode.ONE_PASS,
                 (skin, valueConsumer) -> {
                     SelectBox<Mode> box = new SelectBox<>(skin);
                     box.setItems(Mode.values());
@@ -37,6 +38,7 @@ public class StraightforwardAlgorithm implements Algorithm {
                         public void changed(ChangeEvent event, Actor actor) {
                             SelectBox<Mode> selectBox = (SelectBox<Mode>) actor;
                             valueConsumer.accept(selectBox.getSelected());
+                            world.reset();
                         }
                     });
                     return box;
@@ -44,7 +46,8 @@ public class StraightforwardAlgorithm implements Algorithm {
         ));
     }
 
-    public static StraightforwardAlgorithm instance() {
+    public static StraightforwardAlgorithm instance(MainWorld world) {
+        if (instance == null) instance = new StraightforwardAlgorithm(world);
         return instance;
     }
 
@@ -61,10 +64,26 @@ public class StraightforwardAlgorithm implements Algorithm {
 
         array.clear();
         dijkstra.findPath(world.grid, city, otherCities.get(roadIdx), array);
+        float defaultWeight = world.getParams().defaultWeight;
         float roadWeight = world.getParams().roadWeight;
 
-        for (int i = 0, n = array.size - 1; i < n; ++i) {
-            world.grid.setWeight(array.get(i), array.get(i + 1), roadWeight);
+        Mode mode = (Mode) params.get(0).getValue();
+        switch (mode) {
+            case ONE_PASS -> {
+                for (int i = 0, n = array.size - 1; i < n; ++i) {
+                    world.grid.setWeight(array.get(i), array.get(i + 1), roadWeight);
+                }
+            }
+            case TWO_PASS -> {
+                float halfRoadWeight = (defaultWeight + roadWeight) / 2;
+                for (int i = 0, n = array.size - 1; i < n; ++i) {
+                    float weight = world.grid.getWeight(array.get(i), array.get(i + 1));
+                    if (weight == defaultWeight)
+                        world.grid.setWeight(array.get(i), array.get(i + 1), halfRoadWeight);
+                    else if (weight == halfRoadWeight)
+                        world.grid.setWeight(array.get(i), array.get(i + 1), roadWeight);
+                }
+            }
         }
 
         if (cityIdx == cityMap.size) {

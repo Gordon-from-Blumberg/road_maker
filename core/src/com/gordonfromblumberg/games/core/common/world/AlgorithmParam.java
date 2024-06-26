@@ -11,8 +11,9 @@ public class AlgorithmParam {
     private final BiFunction<Skin, Consumer<Object>, Actor> componentSupplier;
     private Object value;
 
-    public AlgorithmParam(String name, BiFunction<Skin, Consumer<Object>, Actor> componentSupplier) {
+    public AlgorithmParam(String name, Object value, BiFunction<Skin, Consumer<Object>, Actor> componentSupplier) {
         this.name = name;
+        this.value = value;
         this.componentSupplier = componentSupplier;
     }
 

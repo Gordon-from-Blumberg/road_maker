@@ -107,6 +107,15 @@ public class HexGrid implements Graph<Hex>, Iterable<HexRow> {
         }
     }
 
+    public float getWeight(Hex hex1, Hex hex2) {
+        for (int i = 0; i < 6; ++i) {
+            if (hex1.edges[i] != null && hex1.edges[i].hex == hex2) {
+                return hex1.edges[i].weight;
+            }
+        }
+        return Float.NaN;
+    }
+
     @Override
     public void next(Hex node, Array<Edge<Hex>> out) {
         CollectionUtils.addNonNull(out, node.edges);

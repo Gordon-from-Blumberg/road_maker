@@ -24,16 +24,15 @@ public class MainWorld extends World {
     static final float hexIncline;
     static final float defaultWeight = 3f;
     static final float roadWeight = 1f;
-    public static final Array<Algorithm> algorithms = new Array<>();
 
     static {
         final ConfigManager config = AbstractFactory.getInstance().configManager();
         hexWidth = config.getInteger("hexWidth");
         hexHeight = config.getInteger("hexHeight");
         hexIncline = config.getFloat("hexIncline");
-
-        algorithms.add(StraightforwardAlgorithm.instance());
     }
+
+    public final Array<Algorithm> algorithms = new Array<>();
 
     final MainWorldParams params = new MainWorldParams();
     final Array<Hex> emptyHexes = new Array<>();
@@ -43,7 +42,7 @@ public class MainWorld extends World {
     HexGrid grid;
     boolean gridCreated = false;
 
-    private Algorithm algorithm = StraightforwardAlgorithm.instance();
+    private Algorithm algorithm = StraightforwardAlgorithm.instance(this);
 
     private float time;
     private float updateDelay = 1f / 10;
@@ -55,6 +54,8 @@ public class MainWorld extends World {
         log.debug("World init");
         Preferences prefs = Gdx.app.getPreferences(LAST_USED_CONFIG_KEY);
         load(prefs);
+
+        algorithms.add(StraightforwardAlgorithm.instance(this));
     }
 
     public MainWorldParams getParams() {

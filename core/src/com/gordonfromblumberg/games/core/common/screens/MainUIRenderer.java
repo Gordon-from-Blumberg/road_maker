@@ -176,7 +176,7 @@ public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
 
     private SelectBox<Algorithm> algorithmSelector(Skin skin) {
         SelectBox<Algorithm> box = new SelectBox<>(skin);
-        box.setItems(MainWorld.algorithms);
+        box.setItems(world.algorithms);
         box.setSelected(world.getAlgorithm());
         box.addListener(new ChangeListener() {
             @Override
