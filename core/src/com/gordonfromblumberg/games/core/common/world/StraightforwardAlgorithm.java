@@ -17,7 +17,7 @@ public class StraightforwardAlgorithm implements Algorithm {
     private static final Dijkstra<Hex> dijkstra = new Dijkstra<>();
     private static final ObjectMap<Hex, Float> valueMap = new ObjectMap<>();
     private static final Comparator<Hex> cityComparator = new ValueMapComparator<>(valueMap);
-    private static final Array<Hex> array = new Array<>();
+    private static final Array<Hex> path = new Array<>();
 
     private final ObjectMap<Hex, Array<Hex>> cityMap = new ObjectMap<>();
     private final Array<AlgorithmParam> params = new Array<>();
@@ -62,26 +62,26 @@ public class StraightforwardAlgorithm implements Algorithm {
         Hex city = world.cities.get(cityIdx++);
         Array<Hex> otherCities = cityMap.get(city);
 
-        array.clear();
-        dijkstra.findPath(world.grid, city, otherCities.get(roadIdx), array);
+        path.clear();
+        dijkstra.findPath(world.grid, city, otherCities.get(roadIdx), path);
         float defaultWeight = world.getParams().defaultWeight;
         float roadWeight = world.getParams().roadWeight;
 
         Mode mode = (Mode) params.get(0).getValue();
         switch (mode) {
             case ONE_PASS -> {
-                for (int i = 0, n = array.size - 1; i < n; ++i) {
-                    world.grid.setWeight(array.get(i), array.get(i + 1), roadWeight);
+                for (int i = 0, n = path.size - 1; i < n; ++i) {
+                    world.grid.setWeight(path.get(i), path.get(i + 1), roadWeight);
                 }
             }
             case TWO_PASS -> {
                 float halfRoadWeight = (defaultWeight + roadWeight) / 2;
-                for (int i = 0, n = array.size - 1; i < n; ++i) {
-                    float weight = world.grid.getWeight(array.get(i), array.get(i + 1));
+                for (int i = 0, n = path.size - 1; i < n; ++i) {
+                    float weight = world.grid.getWeight(path.get(i), path.get(i + 1));
                     if (weight == defaultWeight)
-                        world.grid.setWeight(array.get(i), array.get(i + 1), halfRoadWeight);
+                        world.grid.setWeight(path.get(i), path.get(i + 1), halfRoadWeight);
                     else if (weight == halfRoadWeight)
-                        world.grid.setWeight(array.get(i), array.get(i + 1), roadWeight);
+                        world.grid.setWeight(path.get(i), path.get(i + 1), roadWeight);
                 }
             }
         }
