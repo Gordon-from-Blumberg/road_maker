@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
+import com.gordonfromblumberg.games.core.common.ui.FloatChangeableLabel;
 import com.gordonfromblumberg.games.core.common.ui.IntChangeableLabel;
 import com.gordonfromblumberg.games.core.common.ui.UIUtils;
 import com.gordonfromblumberg.games.core.common.ui.UpdatableLabel;
@@ -197,7 +198,14 @@ public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
         for (AlgorithmParam param : params) {
             algorithmParamsTable.row();
             algorithmParamsTable.add(param.getName());
-            algorithmParamsTable.add(param.createComponent(skin));
+            Actor component = param.createComponent(skin);
+            if (component instanceof IntChangeableLabel icl) {
+                icl.setFieldWidth(FIELD_WIDTH);
+            }
+            if (component instanceof FloatChangeableLabel fcl) {
+                fcl.setFieldWidth(FIELD_WIDTH);
+            }
+            algorithmParamsTable.add(component);
         }
     }
 

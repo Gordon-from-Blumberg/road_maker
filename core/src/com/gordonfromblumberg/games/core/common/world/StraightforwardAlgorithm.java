@@ -29,10 +29,10 @@ public class StraightforwardAlgorithm implements Algorithm {
         params.add(new AlgorithmParam(
                 "Mode",
                 Mode.ONE_PASS,
-                (skin, valueConsumer) -> {
+                (skin, value, valueConsumer) -> {
                     SelectBox<Mode> box = new SelectBox<>(skin);
                     box.setItems(Mode.values());
-                    box.setSelected(getMode());
+                    box.setSelected((Mode) value);
                     box.addListener(new ChangeListener() {
                         @Override
                         public void changed(ChangeEvent event, Actor actor) {

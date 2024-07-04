@@ -42,7 +42,7 @@ public class MainWorld extends World {
     HexGrid grid;
     boolean gridCreated = false;
 
-    private Algorithm algorithm = StraightforwardAlgorithm.instance(this);
+    private Algorithm algorithm;
 
     private float time;
     private float updateDelay = 1f / 10;
@@ -54,8 +54,6 @@ public class MainWorld extends World {
         log.debug("World init");
         Preferences prefs = Gdx.app.getPreferences(LAST_USED_CONFIG_KEY);
         load(prefs);
-
-        algorithms.add(StraightforwardAlgorithm.instance(this));
     }
 
     public MainWorldParams getParams() {
@@ -89,7 +87,13 @@ public class MainWorld extends World {
     private void load(Preferences prefs) {
         params.load(prefs);
         setStepsPerSec(prefs.getInteger("stepsPerSec", getStepsPerSec()));
+        initAlgorithms();
         setAlgorithm(prefs.getString("algorithm"));
+    }
+
+    private void initAlgorithms() {
+        algorithms.add(StraightforwardAlgorithm.instance(this));
+        algorithms.add(AntsAlgorithm.instance(this));
     }
 
     private void save(Preferences prefs) {
