@@ -116,6 +116,15 @@ public class HexGrid implements Graph<Hex>, Iterable<HexRow> {
         return Float.NaN;
     }
 
+    public int getDir(Hex from, Hex to) {
+        for (int i = 0; i < 6; ++i) {
+            if (from.edges[i] != null && from.edges[i].hex == to) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     @Override
     public void next(Hex node, Array<Edge<Hex>> out) {
         CollectionUtils.addNonNull(out, node.edges);

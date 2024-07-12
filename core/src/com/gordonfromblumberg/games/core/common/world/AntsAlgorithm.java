@@ -2,6 +2,7 @@ package com.gordonfromblumberg.games.core.common.world;
 
 import com.badlogic.gdx.utils.Array;
 import com.gordonfromblumberg.games.core.common.graph.Dijkstra;
+import com.gordonfromblumberg.games.core.common.graph.Edge;
 import com.gordonfromblumberg.games.core.common.grid.Hex;
 import com.gordonfromblumberg.games.core.common.ui.FloatChangeableLabel;
 import com.gordonfromblumberg.games.core.common.ui.IntChangeableLabel;
@@ -10,6 +11,7 @@ import com.gordonfromblumberg.games.core.common.utils.RandomGen;
 public class AntsAlgorithm implements Algorithm {
     private static final String ANT_COUNT = "Ant count";
     private static final String WEIGHT_CHANGE = "Weight change";
+    private static final String ROTATE_CHANCE = "Rotate chance";
     private static AntsAlgorithm instance;
 
     private static final Dijkstra<Hex> dijkstra = new Dijkstra<>();
@@ -45,6 +47,19 @@ public class AntsAlgorithm implements Algorithm {
                     return label;
                 }
         ));
+        params.add(new AlgorithmParam(
+                ROTATE_CHANCE,
+                Float.class,
+                0.1f,
+                (skin, value, valueConsumer) -> {
+                    FloatChangeableLabel label = new FloatChangeableLabel(skin, valueConsumer::accept);
+                    label.setMinValue(0.01f);
+                    label.setMaxValue(0.5f);
+                    label.setValue((float) value);
+                    label.setStep(0.01f);
+                    return label;
+                }
+        ));
     }
 
     public static AntsAlgorithm instance(MainWorld world) {
@@ -61,6 +76,10 @@ public class AntsAlgorithm implements Algorithm {
     public boolean step(MainWorld world) {
         int countToCreate = getAntCount() - ants.size;
         while (countToCreate-- > 0) ants.add(new Ant());
+
+        if (countToCreate < -1) {
+            ants.removeRange(ants.size + 1 + countToCreate, ants.size - 1);
+        }
 
         final float roadWeight = world.getParams().roadWeight;
         final float weightChange = getWeightChange();
@@ -79,6 +98,16 @@ public class AntsAlgorithm implements Algorithm {
             path.clear();
             dijkstra.findPath(world.grid, ant.hex, ant.goal, path);
             Hex next = path.get(1);
+
+            if (RandomGen.INSTANCE.nextBool((float) getParamValue(ROTATE_CHANCE))) {
+                int dir = world.grid.getDir(ant.hex, next);
+                Edge<Hex> relatedEdge = RandomGen.INSTANCE.nextBool()
+                            ? world.grid.next(ant.hex, (dir + 1) % 6)
+                            : world.grid.next(ant.hex, (dir - 1 + 6) % 6);
+                if (relatedEdge != null)
+                    next = relatedEdge.getNode();
+            }
+
             float weight = world.grid.getWeight(ant.hex, next);
             weight = Math.max(weight - weightChange, roadWeight);
             world.grid.setWeight(ant.hex, next, weight);
@@ -106,21 +135,20 @@ public class AntsAlgorithm implements Algorithm {
     }
 
     int getAntCount() {
-        for (AlgorithmParam param : params) {
-            if (ANT_COUNT.equals(param.getName())) {
-                return (int) param.getValue();
-            }
-        }
-        return 0;
+        return (int) getParamValue(ANT_COUNT);
     }
 
     float getWeightChange() {
+        return (float) getParamValue(WEIGHT_CHANGE);
+    }
+
+    Object getParamValue(String name) {
         for (AlgorithmParam param : params) {
-            if (WEIGHT_CHANGE.equals(param.getName())) {
-                return (float) param.getValue();
+            if (name.equals(param.getName())) {
+                return param.getValue();
             }
         }
-        return 0f;
+        return null;
     }
 
     static class Ant {
