@@ -28,6 +28,7 @@ public class StraightforwardAlgorithm implements Algorithm {
     private StraightforwardAlgorithm(MainWorld world) {
         params.add(new AlgorithmParam(
                 "Mode",
+                Mode.class,
                 Mode.ONE_PASS,
                 (skin, value, valueConsumer) -> {
                     SelectBox<Mode> box = new SelectBox<>(skin);

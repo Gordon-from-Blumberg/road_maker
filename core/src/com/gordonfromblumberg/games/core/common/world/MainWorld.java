@@ -52,6 +52,7 @@ public class MainWorld extends World {
     @Override
     public void initialize() {
         log.debug("World init");
+        initAlgorithms();
         Preferences prefs = Gdx.app.getPreferences(LAST_USED_CONFIG_KEY);
         load(prefs);
     }
@@ -87,8 +88,10 @@ public class MainWorld extends World {
     private void load(Preferences prefs) {
         params.load(prefs);
         setStepsPerSec(prefs.getInteger("stepsPerSec", getStepsPerSec()));
-        initAlgorithms();
         setAlgorithm(prefs.getString("algorithm"));
+        for (Algorithm algorithm : algorithms) {
+            algorithm.load("algorithm", prefs);
+        }
     }
 
     private void initAlgorithms() {
@@ -100,6 +103,9 @@ public class MainWorld extends World {
         params.save(prefs);
         prefs.putInteger("stepsPerSec", getStepsPerSec());
         prefs.putString("algorithm", algorithm.toString());
+        for (Algorithm algorithm : algorithms) {
+            algorithm.save("algorithm", prefs);
+        }
     }
 
     @Override
@@ -182,7 +188,7 @@ public class MainWorld extends World {
 
     public void setAlgorithm(Algorithm algorithm) {
         this.algorithm = algorithm;
-        algorithm.reset();
+        reset();
     }
 
     public Algorithm getAlgorithm() {
