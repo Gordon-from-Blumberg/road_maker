@@ -1,24 +1,42 @@
 package com.gordonfromblumberg.games.core.common.world;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectIntMap;
+import com.badlogic.gdx.utils.Pool;
 import com.gordonfromblumberg.games.core.common.graph.Dijkstra;
 import com.gordonfromblumberg.games.core.common.graph.Edge;
 import com.gordonfromblumberg.games.core.common.grid.Hex;
+import com.gordonfromblumberg.games.core.common.grid.HexGrid;
 import com.gordonfromblumberg.games.core.common.ui.FloatChangeableLabel;
 import com.gordonfromblumberg.games.core.common.ui.IntChangeableLabel;
+import com.gordonfromblumberg.games.core.common.utils.Poolable;
 import com.gordonfromblumberg.games.core.common.utils.RandomGen;
+
+import java.util.Iterator;
+import java.util.Objects;
 
 public class AntsAlgorithm implements Algorithm {
     private static final String ANT_COUNT = "Ant count";
     private static final String WEIGHT_CHANGE = "Weight change";
     private static final String ROTATE_CHANCE = "Rotate chance";
+    private static final String LIFE_TURNS = "Life turns";
     private static AntsAlgorithm instance;
 
     private static final Dijkstra<Hex> dijkstra = new Dijkstra<>();
     private static final Array<Hex> path = new Array<>();
+    private static final Pool<LifeMapKey> lifeMapKeyPool = new Pool<>() {
+        @Override
+        protected LifeMapKey newObject() {
+            return new LifeMapKey();
+        }
+    };
 
     private final Array<AlgorithmParam> params = new Array<>();
     private final Array<Ant> ants = new Array<>();
+    private final ObjectIntMap<LifeMapKey> lifeMap = new ObjectIntMap<>();
+
+    private int turn;
 
     public AntsAlgorithm(MainWorld world) {
         params.add(new AlgorithmParam(
@@ -57,6 +75,19 @@ public class AntsAlgorithm implements Algorithm {
                     label.setMaxValue(0.5f);
                     label.setValue((float) value);
                     label.setStep(0.01f);
+                    return label;
+                }
+        ));
+        params.add(new AlgorithmParam(
+                LIFE_TURNS,
+                Integer.class,
+                50,
+                (skin, value, valueConsumer) -> {
+                    IntChangeableLabel label = new IntChangeableLabel(skin, valueConsumer::accept);
+                    label.setMinValue(20);
+                    label.setMaxValue(250);
+                    label.setValue((int) value);
+                    label.setStep(5);
                     return label;
                 }
         ));
@@ -111,17 +142,49 @@ public class AntsAlgorithm implements Algorithm {
             float weight = world.grid.getWeight(ant.hex, next);
             weight = Math.max(weight - weightChange, roadWeight);
             world.grid.setWeight(ant.hex, next, weight);
+
+            LifeMapKey mapKey = getLifeMapKey(ant.hex, next, world.grid);
+            if (lifeMap.containsKey(mapKey)) {
+                lifeMap.put(mapKey, turn);
+                mapKey.release();
+            } else {
+                lifeMap.put(mapKey, turn);
+            }
+
             ant.hex = next;
 
             if (ant.hex == ant.goal) ant.goal = null;
         }
 
+        final float defaultWeight = world.getParams().defaultWeight;
+        final int turnToDie = turn - (int) getParamValue(LIFE_TURNS);
+        Iterator<ObjectIntMap.Entry<LifeMapKey>> itr = lifeMap.iterator();
+        while (itr.hasNext()) {
+            ObjectIntMap.Entry<LifeMapKey> entry = itr.next();
+            if (entry.value <= turnToDie) {
+                float weight = world.grid.getWeight(entry.key.from, entry.key.to);
+                weight = Math.min(weight + weightChange, defaultWeight);
+                if (MathUtils.isEqual(weight, defaultWeight)) {
+                    weight = defaultWeight;
+                    itr.remove();
+                } else {
+                    lifeMap.put(entry.key, turn);
+                }
+                world.grid.setWeight(entry.key.from, entry.key.to, weight);
+            }
+        }
+
+        ++turn;
         return false;
     }
 
     @Override
     public void reset() {
-
+        for (Ant ant : ants) {
+            ant.hex = null;
+            ant.goal = null;
+        }
+        turn = 0;
     }
 
     @Override
@@ -134,11 +197,11 @@ public class AntsAlgorithm implements Algorithm {
         return "Ants";
     }
 
-    int getAntCount() {
+    private int getAntCount() {
         return (int) getParamValue(ANT_COUNT);
     }
 
-    float getWeightChange() {
+    private float getWeightChange() {
         return (float) getParamValue(WEIGHT_CHANGE);
     }
 
@@ -148,11 +211,52 @@ public class AntsAlgorithm implements Algorithm {
                 return param.getValue();
             }
         }
-        return null;
+        throw new IllegalStateException("Unknown param: " + name);
+    }
+
+    private LifeMapKey getLifeMapKey(Hex current, Hex next, HexGrid grid) {
+        LifeMapKey key = lifeMapKeyPool.obtain();
+        return grid.getDir(current, next) < 3
+                ? key.set(current, next)
+                : key.set(next, current);
     }
 
     static class Ant {
         Hex hex;
         Hex goal;
+    }
+
+    static class LifeMapKey implements Poolable {
+        private Hex from;
+        private Hex to;
+
+        LifeMapKey set(Hex from, Hex to) {
+            this.from = from;
+            this.to = to;
+            return this;
+        }
+
+        @Override
+        public void release() {
+            lifeMapKeyPool.free(this);
+        }
+
+        @Override
+        public void reset() {
+            from = null;
+            to = null;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(from, to);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof LifeMapKey other)) return false;
+            return this.from == other.from && this.to == other.to;
+        }
     }
 }
