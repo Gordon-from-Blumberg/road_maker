@@ -79,6 +79,10 @@ public class MainWorldRenderer extends WorldRenderer<MainWorld> {
             }
         }
         shapeRenderer.end();
+
+        if (world.grid != null) {
+            world.getAlgorithm().renderer().render(world.getAlgorithm(), world.grid, shapeRenderer);
+        }
     }
 
     private void drawHexFilled(Hex hex) {

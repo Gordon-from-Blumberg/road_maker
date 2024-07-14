@@ -9,6 +9,7 @@ public interface Algorithm {
     void reset();
     String toString();
     Array<AlgorithmParam> getParams();
+    AlgorithmRenderer renderer();
 
     default void save(String commonPrefix, Preferences prefs) {
         String prefix = commonPrefix + "." + this + ".";

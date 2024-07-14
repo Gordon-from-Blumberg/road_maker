@@ -18,6 +18,7 @@ public class StraightforwardAlgorithm implements Algorithm {
     private static final ObjectMap<Hex, Float> valueMap = new ObjectMap<>();
     private static final Comparator<Hex> cityComparator = new ValueMapComparator<>(valueMap);
     private static final Array<Hex> path = new Array<>();
+    private static final AlgorithmRenderer renderer = (algorithm, grid, shapeRenderer) -> { };
 
     private final ObjectMap<Hex, Array<Hex>> cityMap = new ObjectMap<>();
     private final Array<AlgorithmParam> params = new Array<>();
@@ -131,6 +132,11 @@ public class StraightforwardAlgorithm implements Algorithm {
     @Override
     public String toString() {
         return "Straightforward";
+    }
+
+    @Override
+    public AlgorithmRenderer renderer() {
+        return renderer;
     }
 
     private enum Mode {

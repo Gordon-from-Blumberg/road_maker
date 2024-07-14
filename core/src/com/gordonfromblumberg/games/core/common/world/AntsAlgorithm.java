@@ -31,6 +31,7 @@ public class AntsAlgorithm implements Algorithm {
             return new LifeMapKey();
         }
     };
+    private static final AntsRenderer renderer = new AntsRenderer();
 
     private final Array<AlgorithmParam> params = new Array<>();
     private final Array<Ant> ants = new Array<>();
@@ -178,6 +179,12 @@ public class AntsAlgorithm implements Algorithm {
         return false;
     }
 
+    void getAnts(Array<Hex> out) {
+        for (Ant ant : ants)
+            if (ant.hex != null)
+                out.add(ant.hex);
+    }
+
     @Override
     public void reset() {
         for (Ant ant : ants) {
@@ -195,6 +202,11 @@ public class AntsAlgorithm implements Algorithm {
     @Override
     public String toString() {
         return "Ants";
+    }
+
+    @Override
+    public AlgorithmRenderer renderer() {
+        return renderer;
     }
 
     private int getAntCount() {

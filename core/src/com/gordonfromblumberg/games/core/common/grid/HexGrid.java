@@ -148,6 +148,10 @@ public class HexGrid implements Graph<Hex>, Iterable<HexRow> {
         return hex.y * rowDist;
     }
 
+    public int getHexWidth() {
+        return hexWidth;
+    }
+
     public int getMinX() {
         return minX;
     }
