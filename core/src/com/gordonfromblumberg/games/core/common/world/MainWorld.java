@@ -61,9 +61,10 @@ public class MainWorld extends World {
         return params;
     }
 
-    public void createGrid() {
+    public void createEmptyGrid() {
         running = false;
         finished = false;
+        clearLists();
 
         Preferences prefs = Gdx.app.getPreferences(LAST_USED_CONFIG_KEY);
         save(prefs);
@@ -76,6 +77,10 @@ public class MainWorld extends World {
                 .layers(1)
                 .build();
         gridCreated = true;
+    }
+
+    public void createRandomGrid() {
+        createEmptyGrid();
 
         fillLists();
 
@@ -83,6 +88,37 @@ public class MainWorld extends World {
         generateObstacles();
 
         algorithm.reset();
+    }
+
+    public void setCity(Hex hex) {
+        if (HexType.CITY.equals(hex.getTile(0))) {
+            cities.removeValue(hex, true);
+            hex.setTile(0, null);
+            return;
+        }
+        if (HexType.OBSTACLE.equals(hex.getTile(0))) {
+            setObstacle(hex);
+        }
+        hex.setTile(0, HexType.CITY);
+        cities.add(hex);
+    }
+
+    public void setObstacle(Hex hex) {
+        if (HexType.OBSTACLE.equals(hex.getTile(0))) {
+            for (int i = 0; i < 6; ++i) {
+                Hex next = grid.nextHex(hex, i);
+                if (next != null && !HexType.OBSTACLE.equals(next.getTile(0))) {
+                    grid.createEdge(hex, next, params.defaultWeight);
+                }
+            }
+            hex.setTile(0, null);
+            return;
+        }
+        if (HexType.CITY.equals(hex.getTile(0))) {
+            setCity(hex);
+        }
+        hex.setTile(0, HexType.OBSTACLE);
+        grid.removeEdges(hex);
     }
 
     private void load(Preferences prefs) {
@@ -128,6 +164,10 @@ public class MainWorld extends World {
     public void run() {
         running = true;
         finished = false;
+    }
+
+    public Hex getHexUnderMouse() {
+        return grid.findHex(mouseX, mouseY);
     }
 
     private void generateCities() {

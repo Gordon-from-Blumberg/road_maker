@@ -1,17 +1,20 @@
 package com.gordonfromblumberg.games.core.common.screens;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
+import com.gordonfromblumberg.games.core.common.grid.Hex;
+import com.gordonfromblumberg.games.core.common.log.LogManager;
+import com.gordonfromblumberg.games.core.common.log.Logger;
 import com.gordonfromblumberg.games.core.common.ui.FloatChangeableLabel;
 import com.gordonfromblumberg.games.core.common.ui.IntChangeableLabel;
 import com.gordonfromblumberg.games.core.common.ui.UIUtils;
@@ -25,19 +28,41 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("unchecked")
 public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
+    private static final Logger log = LogManager.create(MainUIRenderer.class);
     private static final float FIELD_WIDTH = 60f;
 
+    private Table mainTable;
+    private Table editorTable;
     private final Table algorithmParamsTable;
 
     public MainUIRenderer(SpriteBatch batch, MainWorld world, Supplier<Vector3> viewCoords) {
         super(batch, world, viewCoords);
 
         final ConfigManager config = AbstractFactory.getInstance().configManager();
-
-        rootTable.add().expandX();
-
         final Skin skin = Assets.manager().get("ui/uiskin.json", Skin.class);
 
+        mainTable = createMainTable(skin, world);
+        editorTable = createEditorTable(skin);
+
+        algorithmParamsTable = createAlgorithmParamsTable(skin);
+
+        mainTable.row();
+        fillAlgorithmParamsTable(world.getAlgorithm().getParams(), skin);
+        mainTable.add(algorithmParamsTable).colspan(2).align(Align.center);
+
+        mainTable.row().expandY().align(Align.bottom);
+        mainTable.add("Status");
+        mainTable.add(new UpdatableLabel(skin, () -> !world.isRunning()
+                ? "Not started" : world.isFinished()
+                ? "Finished" : "In progress"));
+
+        Actor actor = new Actor();
+        actor.addListener(createClickListener(world));
+        rootTable.add(actor).fill().expandX();
+        rootTable.add(mainTable).fillY().expandY().minWidth(config.getFloat("ui.width"));
+    }
+
+    private Table createMainTable(Skin skin, MainWorld world) {
         Table table = UIUtils.createTable(skin);
         table.setBackground(skin.getDrawable("default-round-large"));
         table.defaults().pad(2f);
@@ -74,7 +99,10 @@ public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
         table.add(weightLabel(skin, world::setRoadWeight, (int) params.getRoadWeight()));
 
         table.row();
-        table.add(generateButton(skin)).colspan(2).align(Align.center).padTop(5f).padBottom(15f);
+        table.add(generateRandomButton(skin)).colspan(2).align(Align.center).padTop(5f);
+
+        table.row();
+        table.add(generateManualButton(skin, "Generate grid manually")).colspan(2).align(Align.center).padTop(5f).padBottom(15f);
 
         table.row();
         table.add("Steps per second");
@@ -90,22 +118,45 @@ public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
         table.row();
         table.add("Algorithm parameters").colspan(2).align(Align.center);
 
-        algorithmParamsTable = UIUtils.createTable(skin);
-        algorithmParamsTable.defaults().pad(2f);
-        algorithmParamsTable.columnDefaults(0).align(Align.right);
-        algorithmParamsTable.columnDefaults(1).align(Align.left);
+        return table;
+    }
+
+    private Table createEditorTable(Skin skin) {
+        Table table = UIUtils.createTable(skin);
+        table.setBackground(skin.getDrawable("default-round-large"));
+        table.defaults().pad(2f);
+        table.columnDefaults(0).align(Align.right);
+        table.columnDefaults(1).align(Align.left);
+
+        final MainWorldParams params = world.getParams();
+        IntChangeableLabel heightLabel = sizeLabel(skin, params::setHeight, params.getHeight());
+        table.add("Grid shape");
+        table.add(shapeSelector(skin, heightLabel)).fillX();
 
         table.row();
-        fillAlgorithmParamsTable(world.getAlgorithm().getParams(), skin);
-        table.add(algorithmParamsTable).colspan(2).align(Align.center);
+        table.add("Width");
+        table.add(sizeLabel(skin, params::setWidth, params.getWidth()));
 
-        table.row().expandY().align(Align.bottom);
-        table.add("Status");
-        table.add(new UpdatableLabel(skin, () -> !world.isRunning()
-                ? "Not started" : world.isFinished()
-                ? "Finished" : "In progress"));
+        table.row();
+        table.add("Height");
+        table.add(heightLabel);
 
-        rootTable.add(table).fillY().expandY();
+        table.row();
+        table.add(generateManualButton(skin, "Create grid")).colspan(2).align(Align.center).padTop(5f);
+
+        table.row();
+        table.add(generateSaveButton(skin)).colspan(2).align(Align.center).padTop(5f).padBottom(15f);
+
+        return table;
+    }
+
+    private Table createAlgorithmParamsTable(Skin skin) {
+        Table table = UIUtils.createTable(skin);
+        table.defaults().pad(2f);
+        table.columnDefaults(0).align(Align.right);
+        table.columnDefaults(1).align(Align.left);
+
+        return table;
     }
 
     private IntChangeableLabel sizeLabel(Skin skin, IntConsumer onChangeListener, int value) {
@@ -209,8 +260,41 @@ public class MainUIRenderer extends WorldUIRenderer<MainWorld> {
         }
     }
 
-    private TextButton generateButton(Skin skin) {
-        return UIUtils.textButton("Generate grid", skin, world::createGrid, null);
+    private TextButton generateRandomButton(Skin skin) {
+        return UIUtils.textButton("Generate grid randomly", skin, world::createRandomGrid, null);
+    }
+
+    private TextButton generateManualButton(Skin skin, String text) {
+        return UIUtils.textButton(text, skin, () -> {
+            Cell<Table> tableCell = rootTable.getCell(mainTable);
+            if (tableCell != null) tableCell.setActor(editorTable);
+            world.createEmptyGrid();
+        }, null);
+    }
+
+    private TextButton generateSaveButton(Skin skin) {
+        return UIUtils.textButton("Save", skin, () -> {
+            Cell<Table> tableCell = rootTable.getCell(editorTable);
+            if (tableCell != null) tableCell.setActor(mainTable);
+        }, null);
+    }
+
+    private ClickListener createClickListener(MainWorld world) {
+        return new ClickListener(-1) {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (editorTable.getStage() != null) {
+                    Hex hex = world.getHexUnderMouse();
+                    if (hex == null)
+                        return;
+
+                    switch (event.getButton()) {
+                        case Input.Buttons.LEFT -> world.setCity(hex);
+                        case Input.Buttons.RIGHT -> world.setObstacle(hex);
+                    }
+                }
+            }
+        };
     }
 
     private TextButton runButton(Skin skin) {

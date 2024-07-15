@@ -5,6 +5,7 @@ import com.gordonfromblumberg.games.core.common.graph.Edge;
 import com.gordonfromblumberg.games.core.common.graph.Graph;
 import com.gordonfromblumberg.games.core.common.utils.CollectionUtils;
 
+import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.function.IntUnaryOperator;
 
@@ -97,6 +98,33 @@ public class HexGrid implements Graph<Hex>, Iterable<HexRow> {
         }
     }
 
+    public void createEdge(Hex hex1, Hex hex2, float weight) {
+        for (int i = 0; i < 6; ++i) {
+            int nx = dx[i].applyAsInt(hex1.y) + hex1.x;
+            int ny = dy[i] + hex1.y;
+            if (hex2 == getHex(nx, ny)) {
+                hex1.edges[i] = new HexEdge(hex2, weight);
+                hex2.edges[(i + 3) % 6] = new HexEdge(hex1, weight);
+                return;
+            }
+        }
+    }
+
+    public void save(ByteBuffer bb) {
+        // todo
+    }
+
+    public static HexGrid load(ByteBuffer bb) {
+        int hexWidth = bb.getInt();
+        int hexHeight = bb.getInt();
+        float incline = bb.getFloat();
+        int rowCount = bb.getInt();
+        int layerCount = bb.getInt();
+        final HexGrid grid = new HexGrid(hexWidth, hexHeight, incline, rowCount, layerCount);
+        // todo
+        return grid;
+    }
+
     public void setWeight(Hex hex1, Hex hex2, float weight) {
         for (int i = 0; i < 6; ++i) {
             if (hex1.edges[i] != null && hex1.edges[i].hex == hex2) {
@@ -132,6 +160,15 @@ public class HexGrid implements Graph<Hex>, Iterable<HexRow> {
 
     public Edge<Hex> next(Hex node, int dir) {
         return node.edges[dir];
+    }
+
+    public Hex nextHex(Hex node, int dir) {
+        if (node.edges[dir] != null)
+            return node.edges[dir].hex;
+
+        int nx = dx[dir].applyAsInt(node.y) + node.x;
+        int ny = dy[dir] + node.y;
+        return getHex(nx, ny);
     }
 
     @Override
